@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.aunt.opeace"
-        minSdk = 28
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -73,6 +73,8 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
+    //implementation(libs.splash.screen)
+    implementation("androidx.core:core-splashscreen:1.0.0")
     implementation(libs.retrofit)
     implementation(libs.gson)
     implementation(libs.okhttp)

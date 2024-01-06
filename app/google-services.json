@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940949450606",
+    "project_id": "opeace-5005c",
+    "storage_bucket": "opeace-5005c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940949450606:android:b6162c85b7434883781b7f",
+        "android_client_info": {
+          "package_name": "com.aunt.opeace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoNKBJh32uMnBXEXz1CsnCSQRSTawyLV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,10 +1,13 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
+    //id("com.android.application")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
 
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -83,4 +86,6 @@ dependencies {
 
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
 }

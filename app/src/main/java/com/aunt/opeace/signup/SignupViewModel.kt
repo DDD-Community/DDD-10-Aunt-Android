@@ -3,9 +3,10 @@ package com.aunt.opeace.signup
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Calendar
+import javax.inject.Inject
 
 @HiltViewModel
-class SignupViewModel : ViewModel() {
+class SignupViewModel @Inject constructor() : ViewModel() {
 
     private val currentYear: Int
         get() = Calendar.getInstance()[Calendar.YEAR]

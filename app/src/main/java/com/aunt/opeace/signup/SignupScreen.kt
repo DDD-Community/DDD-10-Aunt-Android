@@ -7,29 +7,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceTopBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SignupScreen() {
+    val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { 3 })
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-
         OPeaceTopBar(
             title = "",
             leftImageResId = 0,
             rightImageResId = 0
         )
 
-        HorizontalPager(state = pagerState) {
+        SignupIndicator()
 
+        HorizontalPager(state = pagerState) {
+            when (it) {
+                0 -> NicknamePage()
+                1 -> AgePage()
+                2 -> JobPage()
+            }
         }
 
         OPeaceButton(

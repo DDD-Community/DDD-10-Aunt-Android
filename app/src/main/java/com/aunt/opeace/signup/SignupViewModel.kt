@@ -11,18 +11,21 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     private val currentYear: Int
         get() = Calendar.getInstance()[Calendar.YEAR]
 
-    fun isValidLength(input: String): Boolean = input.length in (2..5)
+    private val _state = SignupState()
+    val state: SignupState
+        get() = _state
 
-    fun isValidName(input: String): Boolean =
-        Regex("[^\\s\\p{P}]").toPattern().matcher(input).find()
+    fun handleEvent(event: Event) = when (event) {
+        is Event.SetNickname -> _state.copy(nickname = event.nickname)
+    }
 
-    fun isValidAge(input: String): Boolean {
+    private fun isValidAge(input: String): Boolean {
         return input.toIntOrNull()
             ?.let { it < currentYear - 14 }
             ?: false
     }
 
-    fun getGeneration(age: Int): String {
+    private fun getGeneration(age: Int): String {
         return when (age) {
             in (1955..1964) -> "베이비붐"
             in (1965..1980) -> "X"
@@ -33,8 +36,13 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-data class SignupUiState(
-    val nickname: String,
-    val age: String,
-    val job: String,
+sealed interface Event {
+    data class SetNickname(val nickname: String) : Event
+}
+
+data class SignupState(
+    val nickname: String = "",
+    val age: String = "",
+    val job: String = "",
+
 )

@@ -1,7 +1,9 @@
 package com.aunt.opeace.signup
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,20 +24,21 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceErrorText
 import com.aunt.opeace.common.OPeaceTextField
 import kotlinx.coroutines.delay
 
 @Composable
 fun AgePage(
-    focusRequester: FocusRequester,
     title: String = "나이 입력",
     subTitle: String = "출생 연도를 알려주세요",
     isValidAge: Boolean,
     generation: String,
     onSentAge: (String) -> Unit,
-    onSentButtonEnable: (Boolean) -> Unit
+    onClickNextButton: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
     val age = remember { mutableStateOf(TextFieldValue()) }
 
     LaunchedEffect(true) {
@@ -43,52 +46,51 @@ fun AgePage(
         focusRequester.requestFocus()
     }
 
-    LaunchedEffect(
-        key1 = isValidAge,
-        key2 = generation
-    ) {
-        if (generation.isNotBlank() && isValidAge) {
-            onSentButtonEnable(true)
-        } else {
-            onSentButtonEnable(false)
-        }
-    }
-
     InputPage(title = title, subTitle = subTitle) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(65.dp))
-            OPeaceTextField(
-                modifier = Modifier.focusRequester(focusRequester),
-                value = age.value,
-                onValueChange = {
-                    if (it.text.length <= 4) {
-                        age.value = it
-                        onSentAge(it.text)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.height(65.dp))
+                OPeaceTextField(
+                    modifier = Modifier.focusRequester(focusRequester),
+                    value = age.value,
+                    onValueChange = {
+                        if (it.text.length <= 4) {
+                            age.value = it
+                            onSentAge(it.text)
+                        }
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.W700
+                    ).copy(textAlign = TextAlign.Center),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    placeHolder = {
+                        AgePlaceholder()
                     }
-                },
-                textStyle = TextStyle(
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.W700
-                ).copy(textAlign = TextAlign.Center),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                placeHolder = {
-                    AgePlaceholder()
+                )
+                if (generation.isNotBlank() && isValidAge) {
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text = generation
+                    )
                 }
+                if (isValidAge.not()) {
+                    OPeaceErrorText(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text = "정확한 연도를 입력해 주세요"
+                    )
+                }
+            }
+            OPeaceButton(
+                modifier = Modifier
+                    .align(alignment = Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
+                    .padding(horizontal = 20.dp),
+                enabled = generation.isNotBlank() && isValidAge,
+                onClick = onClickNextButton
             )
-            if (generation.isNotBlank() && isValidAge) {
-                Text(
-                    modifier = Modifier.padding(top = 16.dp),
-                    text = generation
-                )
-            }
-            if (isValidAge.not()) {
-                OPeaceErrorText(
-                    modifier = Modifier.padding(top = 16.dp),
-                    text = "정확한 연도를 입력해 주세요"
-                )
-            }
         }
     }
 }

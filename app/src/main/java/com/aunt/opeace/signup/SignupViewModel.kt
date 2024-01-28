@@ -10,10 +10,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor() : ViewModel() {
-
-    private val currentYear: Int
-        get() = Calendar.getInstance()[Calendar.YEAR]
-
     private val _state = MutableStateFlow(SignupState())
     val state: StateFlow<SignupState>
         get() = _state.asStateFlow()
@@ -25,12 +21,16 @@ class SignupViewModel @Inject constructor() : ViewModel() {
         is Event.SetAge -> {
             _state.value = _state.value.copy(age = event.age)
         }
+        is Event.OnClickJob -> {
+            _state.value = _state.value.copy(job = event.job)
+        }
     }
 }
 
 sealed interface Event {
     data class SetNickname(val nickname: String) : Event
     data class SetAge(val age: String) : Event
+    data class OnClickJob(val job: String) : Event
 }
 
 data class SignupState(
@@ -38,11 +38,12 @@ data class SignupState(
     val age: String = "",
     val job: String = "",
 ) {
+    private val minimumYear: Int = Calendar.getInstance()[Calendar.YEAR] - 14
     val isValidAge: Boolean
         get() {
             return if (age.length == 4) {
                 age.toIntOrNull()?.let {
-                    it < Calendar.getInstance()[Calendar.YEAR] - 14
+                    it < minimumYear
                 } ?: false
             } else {
                 true

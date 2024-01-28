@@ -1,8 +1,11 @@
 package com.aunt.opeace.signup
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,74 +22,75 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceErrorText
 import com.aunt.opeace.common.OPeaceTextField
 import kotlinx.coroutines.delay
 
 @Composable
 fun NicknamePage(
-    focusRequester: FocusRequester,
     title: String = "닉네임 입력",
     subTitle: String = "2~5자까지 입력할 수 있어요",
-    isShowErrorMessage: Boolean,
-    errorMessage: String,
     onSentNickname: (String) -> Unit,
-    onSentButtonEnable: (Boolean) -> Unit,
-    onSentIsShowErrorMessage: (Boolean) -> Unit,
-    onSentErrorMessage: (String) -> Unit
+    onClickNextButton: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
     val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
+    val isShowErrorMessage = remember { mutableStateOf(false) }
+    val errorMessage = remember { mutableStateOf("") }
 
     LaunchedEffect(true) {
         delay(200)
         focusRequester.requestFocus()
     }
 
-    LaunchedEffect(key1 = textFieldValue.value.text.length) {
-        if (textFieldValue.value.text.length in (2..5)) {
-            onSentButtonEnable(isShowErrorMessage.not())
-        } else {
-            onSentButtonEnable(false)
-        }
-    }
-
     InputPage(title = title, subTitle = subTitle) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(65.dp))
-            OPeaceTextField(
-                modifier = Modifier
-                    .focusRequester(focusRequester),
-                value = textFieldValue.value,
-                onValueChange = {
-                    checkNicknameWithAction(
-                        nickname = it.text,
-                        isShowErrorMessage = onSentIsShowErrorMessage,
-                        errorMessage = onSentErrorMessage
-                    )
-                    if (it.text.length <= 6) {
-                        textFieldValue.value = it
-                        onSentNickname(it.text)
-                    }
-                },
-                textStyle = TextStyle(
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.W700,
-                    color = Color.Black
-                ).copy(textAlign = TextAlign.Center),
-                placeHolder = {
-                    Text(
-                        text = "빵미",
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.height(65.dp))
+                OPeaceTextField(
+                    modifier = Modifier
+                        .focusRequester(focusRequester),
+                    value = textFieldValue.value,
+                    onValueChange = {
+                        checkNicknameWithAction(
+                            nickname = it.text,
+                            isShowErrorMessage = isShowErrorMessage::value::set,
+                            errorMessage = errorMessage::value::set
+                        )
+                        if (it.text.length <= 6) {
+                            textFieldValue.value = it
+                            onSentNickname(it.text)
+                        }
+                    },
+                    textStyle = TextStyle(
                         fontSize = 48.sp,
                         fontWeight = FontWeight.W700,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center
-                    )
+                        color = Color.Black
+                    ).copy(textAlign = TextAlign.Center),
+                    placeHolder = {
+                        Text(
+                            text = "빵미",
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.W700,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                if (isShowErrorMessage.value) {
+                    OPeaceErrorText(text = errorMessage.value)
                 }
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            if (isShowErrorMessage) {
-                OPeaceErrorText(text = errorMessage)
             }
+            OPeaceButton(
+                modifier = Modifier
+                    .align(alignment = Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
+                    .padding(horizontal = 20.dp),
+                enabled = textFieldValue.value.text.length in (2..5), // NOTE : 서버 통신 후 처리
+                onClick = onClickNextButton
+            )
         }
     }
 }

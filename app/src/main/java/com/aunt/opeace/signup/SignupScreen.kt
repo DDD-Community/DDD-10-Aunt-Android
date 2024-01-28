@@ -1,15 +1,16 @@
 package com.aunt.opeace.signup
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,13 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceTopBar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -54,6 +56,7 @@ fun Content(
 ) {
     val isValidAge: Boolean = viewModel.state.collectAsState().value.isValidAge
     val generation: String = viewModel.state.collectAsState().value.generation
+    val job: String = viewModel.state.collectAsState().value.job
 
     Content(
         pagerState = pagerState,
@@ -61,6 +64,7 @@ fun Content(
         keyboardController = keyboardController,
         isValidAge = isValidAge,
         generation = generation,
+        job = job,
         onSentEvent = viewModel::handleEvent
     )
 }
@@ -73,13 +77,9 @@ fun Content(
     keyboardController: SoftwareKeyboardController?,
     isValidAge: Boolean,
     generation: String,
+    job: String,
     onSentEvent: (Event) -> Unit
 ) {
-    val isEnabledButton = remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
-    val isShowErrorMessage = remember { mutableStateOf(false) }
-    val errorMessage = remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -99,46 +99,45 @@ fun Content(
         ) { currentPage ->
             when (currentPage) {
                 0 -> NicknamePage(
-                    focusRequester = focusRequester,
                     onSentNickname = {
                         onSentEvent(Event.SetNickname(it))
                     },
-                    onSentButtonEnable = isEnabledButton::value::set,
-                    isShowErrorMessage = isShowErrorMessage.value,
-                    onSentIsShowErrorMessage = isShowErrorMessage::value::set,
-                    errorMessage = errorMessage.value,
-                    onSentErrorMessage = errorMessage::value::set
+                    onClickNextButton = {
+                        coroutineScope.launch {
+                            keyboardController?.hide()
+                            delay(200)
+                            pagerState.animateScrollToPage(page = 1)
+                        }
+                    }
                 )
 
                 1 -> AgePage(
-                    focusRequester = focusRequester,
                     isValidAge = isValidAge,
                     generation = generation,
                     onSentAge = {
                         onSentEvent(Event.SetAge(it))
                     },
-                    onSentButtonEnable = isEnabledButton::value::set
-                )
-
-                2 -> JobPage()
-            }
-        }
-        OPeaceButton(
-            modifier = Modifier
-                .padding(bottom = 32.dp)
-                .padding(horizontal = 20.dp),
-            enabled = isEnabledButton.value
-        ) {
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(
-                    page = when (pagerState.currentPage) {
-                        0 -> 1
-                        1 -> 2
-                        else -> 0 // NOTE : 메인?화면으로 이동 해야함
+                    onClickNextButton = {
+                        coroutineScope.launch {
+                            keyboardController?.hide()
+                            delay(200)
+                            pagerState.animateScrollToPage(page = 2)
+                        }
                     }
                 )
+
+                2 -> {
+                    JobPage(
+                        job = job,
+                        onClick = {
+                            onSentEvent(Event.OnClickJob(it))
+                        },
+                        onClickNextButton = {
+                            // NOTE : 다음 화면으로 이동
+                        }
+                    )
+                }
             }
-            keyboardController?.hide()
         }
     }
 }

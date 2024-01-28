@@ -19,29 +19,32 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.common.OPeaceErrorText
 import com.aunt.opeace.common.OPeaceTextField
 import kotlinx.coroutines.delay
 
 @Composable
 fun NicknamePage(
+    focusRequester: FocusRequester,
     title: String = "닉네임 입력",
     subTitle: String = "2~5자까지 입력할 수 있어요",
+    isShowErrorMessage: Boolean,
+    errorMessage: String,
     onSentNickname: (String) -> Unit,
-    onSentButtonEnable: (Boolean) -> Unit
+    onSentButtonEnable: (Boolean) -> Unit,
+    onSentIsShowErrorMessage: (Boolean) -> Unit,
+    onSentErrorMessage: (String) -> Unit
 ) {
-    val focusRequest = remember { FocusRequester() }
     val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
-    val isShowErrorMessage = remember { mutableStateOf(false) }
-    val errorMessage = remember { mutableStateOf("") }
 
     LaunchedEffect(true) {
         delay(200)
-        focusRequest.requestFocus()
+        focusRequester.requestFocus()
     }
 
     LaunchedEffect(key1 = textFieldValue.value.text.length) {
         if (textFieldValue.value.text.length in (2..5)) {
-            onSentButtonEnable(isShowErrorMessage.value.not())
+            onSentButtonEnable(isShowErrorMessage.not())
         } else {
             onSentButtonEnable(false)
         }
@@ -52,13 +55,13 @@ fun NicknamePage(
             Spacer(modifier = Modifier.height(65.dp))
             OPeaceTextField(
                 modifier = Modifier
-                    .focusRequester(focusRequest),
+                    .focusRequester(focusRequester),
                 value = textFieldValue.value,
                 onValueChange = {
                     checkNicknameWithAction(
                         nickname = it.text,
-                        isShowErrorMessage = isShowErrorMessage::value::set,
-                        errorMessage = errorMessage::value::set
+                        isShowErrorMessage = onSentIsShowErrorMessage,
+                        errorMessage = onSentErrorMessage
                     )
                     if (it.text.length <= 6) {
                         textFieldValue.value = it
@@ -81,21 +84,11 @@ fun NicknamePage(
                 }
             )
             Spacer(modifier = Modifier.height(20.dp))
-            if (isShowErrorMessage.value) {
-                ErrorMessage(message = errorMessage.value)
+            if (isShowErrorMessage) {
+                OPeaceErrorText(text = errorMessage)
             }
         }
     }
-}
-
-@Composable
-private fun ErrorMessage(message: String) {
-    Text(
-        text = message,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.W500,
-        color = Color.Red,
-    )
 }
 
 private fun checkNicknameWithAction(

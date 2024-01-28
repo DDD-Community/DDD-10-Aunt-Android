@@ -12,11 +12,15 @@ import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), BackHandlerInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         initSplashScreen()
+    }
+
+    override fun exit() {
+        finish()
     }
 
     private fun initSplashScreen() {

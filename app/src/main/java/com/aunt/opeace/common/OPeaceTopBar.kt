@@ -3,6 +3,7 @@ package com.aunt.opeace.common
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.aunt.opeace.R
@@ -22,18 +22,20 @@ import com.aunt.opeace.R
 fun OPeaceTopBar(
     title: String = "",
     @DrawableRes leftImageResId: Int = R.drawable.ic_24_previous,
-    @DrawableRes rightImageResId: Int = 0
+    @DrawableRes rightImageResId: Int = 0,
+    onClickLeftImage: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Gray) // NOTE : 임의의 색상 지정
             .height(48.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier
+                .size(48.dp)
+                .clickable(onClick = onClickLeftImage),
             painter = painterResource(id = leftImageResId),
             contentDescription = "Left Image",
         )

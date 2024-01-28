@@ -1,6 +1,6 @@
 package com.aunt.opeace.signup
 
-import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,20 +10,17 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aunt.opeace.BackHandlerInterface
 import com.aunt.opeace.common.OPeaceTopBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -34,12 +31,23 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignupScreen() {
     val viewModel: SignupViewModel = viewModel()
+    val context = (LocalContext.current as BackHandlerInterface)
     val pagerState = rememberPagerState(pageCount = { 3 })
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    BackHandler {
+        moveToPreviousPage(
+            context = context,
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+            keyboardController = keyboardController
+        )
+    }
+
     Content(
         viewModel = viewModel,
+        context = context,
         pagerState = pagerState,
         coroutineScope = coroutineScope,
         keyboardController = keyboardController
@@ -50,6 +58,7 @@ fun SignupScreen() {
 @Composable
 fun Content(
     viewModel: SignupViewModel,
+    context: BackHandlerInterface,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     keyboardController: SoftwareKeyboardController?,
@@ -59,6 +68,7 @@ fun Content(
     val job: String = viewModel.state.collectAsState().value.job
 
     Content(
+        context = context,
         pagerState = pagerState,
         coroutineScope = coroutineScope,
         keyboardController = keyboardController,
@@ -72,6 +82,7 @@ fun Content(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun Content(
+    context: BackHandlerInterface,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     keyboardController: SoftwareKeyboardController?,
@@ -84,7 +95,16 @@ fun Content(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OPeaceTopBar()
+        OPeaceTopBar(
+            onClickLeftImage = {
+                moveToPreviousPage(
+                    context = context,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    keyboardController = keyboardController
+                )
+            }
+        )
         Spacer(modifier = Modifier.height(27.dp))
         SignupIndicator(
             currentPage = pagerState.currentPage,
@@ -95,7 +115,7 @@ fun Content(
             modifier = Modifier.weight(1f),
             state = pagerState,
             verticalAlignment = Alignment.Top,
-            userScrollEnabled = false
+            userScrollEnabled = false,
         ) { currentPage ->
             when (currentPage) {
                 0 -> NicknamePage(
@@ -138,6 +158,27 @@ fun Content(
                     )
                 }
             }
+        }
+    }
+}
+
+// TODO : 마지막 page에서 뒤로가기 클릭 시 이전 화면으로 이동했다가 제일 처음 화면으로 이동하는 문제가 있음
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+private fun moveToPreviousPage(
+    context: BackHandlerInterface,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    keyboardController: SoftwareKeyboardController?
+) {
+    when (pagerState.currentPage) {
+        0 -> context.exit()
+        1 -> coroutineScope.launch {
+            keyboardController?.hide()
+            pagerState.animateScrollToPage(page = 0)
+        }
+
+        2 -> coroutineScope.launch {
+            pagerState.animateScrollToPage(page = 1)
         }
     }
 }

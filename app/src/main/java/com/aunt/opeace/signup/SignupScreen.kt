@@ -52,12 +52,16 @@ fun Content(
     ) {
         OPeaceTopBar()
         Spacer(modifier = Modifier.height(27.dp))
-        SignupIndicator()
+        SignupIndicator(
+            currentPage = pagerState.currentPage,
+            maxPage = pagerState.pageCount
+        )
         Spacer(modifier = Modifier.height(44.dp))
         HorizontalPager(
             modifier = Modifier.weight(1f),
             state = pagerState,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
+            userScrollEnabled = false
         ) { currentPage ->
             when (currentPage) {
                 0 -> NicknamePage(

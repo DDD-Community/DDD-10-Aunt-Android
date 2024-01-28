@@ -11,14 +11,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SignupIndicator(modifier: Modifier = Modifier) {
+fun SignupIndicator(
+    currentPage: Int,
+    maxPage: Int
+) {
     Row(
-        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        CurrentDot()
-        Dot()
-        Dot()
+        for (i in 0 until maxPage) {
+            if (i == currentPage) {
+                CurrentDot()
+            } else {
+                Dot()
+            }
+        }
     }
 }
 

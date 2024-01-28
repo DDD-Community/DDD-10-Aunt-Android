@@ -95,6 +95,7 @@ fun Content(
             modifier = Modifier.weight(1f),
             state = pagerState,
             verticalAlignment = Alignment.Top,
+            userScrollEnabled = false
         ) { currentPage ->
             when (currentPage) {
                 0 -> NicknamePage(

@@ -1,11 +1,13 @@
 package com.aunt.opeace.signup
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -27,6 +30,9 @@ import androidx.compose.ui.unit.sp
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceErrorText
 import com.aunt.opeace.common.OPeaceTextField
+import com.aunt.opeace.ui.theme.WHITE
+import com.aunt.opeace.ui.theme.WHITE_200
+import com.aunt.opeace.ui.theme.WHITE_500
 import kotlinx.coroutines.delay
 
 @Composable
@@ -61,7 +67,8 @@ fun AgePage(
                     },
                     textStyle = TextStyle(
                         fontSize = 48.sp,
-                        fontWeight = FontWeight.W700
+                        fontWeight = FontWeight.W700,
+                        color = WHITE
                     ).copy(textAlign = TextAlign.Center),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
@@ -72,8 +79,21 @@ fun AgePage(
                 )
                 if (generation.isNotBlank() && isValidAge) {
                     Text(
-                        modifier = Modifier.padding(top = 16.dp),
-                        text = generation
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .clip(RoundedCornerShape(40.dp))
+                            .background(color = WHITE_500)
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            ),
+                        text = generation,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W500,
+                            color = WHITE_200
+                        ),
+                        textAlign = TextAlign.Center
                     )
                 }
                 if (isValidAge.not()) {
@@ -103,7 +123,7 @@ private fun AgePlaceholder() {
             fontSize = 48.sp,
             fontWeight = FontWeight.W700,
             textAlign = TextAlign.Center,
-            color = Color.Gray,
+            color = Color.Gray, // 색상 지정 안되어 있음
         )
     )
 }

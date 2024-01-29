@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.aunt.opeace.ui.theme.LIGHTEN
+import com.aunt.opeace.ui.theme.WHITE_400
 
 @Composable
 fun SignupIndicator(
@@ -32,7 +33,7 @@ fun SignupIndicator(
 private fun CurrentDot() {
     Canvas(modifier = Modifier.size(18.dp, 6.dp), onDraw = {
         drawRoundRect(
-            color = Color(0xff90ff00),
+            color = LIGHTEN,
             cornerRadius = CornerRadius(160.dp.toPx(), 160.dp.toPx())
         )
     })
@@ -42,6 +43,6 @@ private fun CurrentDot() {
 private fun Dot() {
     Canvas(
         modifier = Modifier.size(6.dp),
-        onDraw = { drawCircle(color = Color.Gray) }
+        onDraw = { drawCircle(color = WHITE_400) }
     )
 }

@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.ui.theme.WHITE
+import com.aunt.opeace.ui.theme.WHITE_300
 
 
 @Composable
@@ -26,9 +28,23 @@ fun InputPage(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = title, style = TextStyle(fontSize = 24.sp, fontWeight = W700))
+        Text(
+            text = title,
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = W700,
+                color = WHITE
+            )
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = subTitle, style = TextStyle(fontSize = 16.sp, fontWeight = W500))
+        Text(
+            text = subTitle,
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = W500,
+                color = WHITE_300
+            )
+        )
         content()
     }
 }

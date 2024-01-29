@@ -2,6 +2,7 @@ package com.aunt.opeace.signup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.BackHandlerInterface
 import com.aunt.opeace.common.OPeaceTopBar
+import com.aunt.opeace.ui.theme.WHITE_600
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -92,7 +94,9 @@ fun Content(
     onSentEvent: (Event) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = WHITE_600),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OPeaceTopBar(

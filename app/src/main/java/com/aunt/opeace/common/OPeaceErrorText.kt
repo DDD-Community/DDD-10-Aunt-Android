@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.ui.theme.ALERT
 
 @Composable
 fun OPeaceErrorText(
@@ -14,7 +15,7 @@ fun OPeaceErrorText(
     text: String,
     fontSize: TextUnit = 16.sp,
     fontWeight: FontWeight = FontWeight.W500,
-    color: Color = Color.Red
+    color: Color = ALERT
 ) {
     Text(
         modifier = modifier,

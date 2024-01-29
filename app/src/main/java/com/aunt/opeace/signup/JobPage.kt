@@ -16,16 +16,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aunt.opeace.color.LIGHTEN_0
-import com.aunt.opeace.color.WHITE_400
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.constants.jobList
+import com.aunt.opeace.ui.theme.LIGHTEN
+import com.aunt.opeace.ui.theme.WHITE
+import com.aunt.opeace.ui.theme.WHITE_500
+import com.aunt.opeace.ui.theme.WHITE_600
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -84,9 +85,9 @@ private fun TextChip(
             .clip(RoundedCornerShape(40.dp))
             .background(
                 if (isSelected) {
-                    LIGHTEN_0
+                    LIGHTEN
                 } else {
-                    WHITE_400
+                    WHITE_500
                 }
             )
             .padding(
@@ -98,7 +99,11 @@ private fun TextChip(
         style = TextStyle(
             fontSize = 18.sp,
             fontWeight = W500,
-            color = Color.Black
+            color = if (isSelected) {
+                WHITE_600
+            } else {
+                WHITE
+            }
         ),
         textAlign = TextAlign.Center
     )

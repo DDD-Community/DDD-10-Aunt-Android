@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceErrorText
 import com.aunt.opeace.common.OPeaceTextField
+import com.aunt.opeace.ui.theme.WHITE
 import kotlinx.coroutines.delay
 
 @Composable
@@ -66,14 +67,14 @@ fun NicknamePage(
                     textStyle = TextStyle(
                         fontSize = 48.sp,
                         fontWeight = FontWeight.W700,
-                        color = Color.Black
+                        color = WHITE
                     ).copy(textAlign = TextAlign.Center),
                     placeHolder = {
                         Text(
                             text = "빵미",
                             fontSize = 48.sp,
                             fontWeight = FontWeight.W700,
-                            color = Color.Gray,
+                            color = Color.Gray, // 색상 지정 안되어 있음
                             textAlign = TextAlign.Center
                         )
                     }

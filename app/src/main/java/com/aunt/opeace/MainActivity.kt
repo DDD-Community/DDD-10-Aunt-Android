@@ -6,6 +6,8 @@ import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Surface
+import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import com.aunt.opeace.signup.SignupScreen
 import com.aunt.opeace.ui.theme.OPeaceTheme

@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
+import com.aunt.opeace.login.LoginScreen
 import com.aunt.opeace.signup.SignupScreen
 import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +47,8 @@ class MainActivity : ComponentActivity(), BackHandlerInterface {
     private fun showSignupScreen() {
         setContent {
             OPeaceTheme {
-                SignupScreen()
+                //SignupScreen()
+                LoginScreen()
             }
         }
     }

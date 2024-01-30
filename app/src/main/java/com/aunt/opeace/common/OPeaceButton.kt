@@ -12,12 +12,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aunt.opeace.ui.theme.LIGHTEN
+import com.aunt.opeace.ui.theme.WHITE
+import com.aunt.opeace.ui.theme.WHITE_200
 
 @Composable
 fun OPeaceButton(
     modifier: Modifier = Modifier,
     title: String = "다음",
     enabled: Boolean = true,
+    containerColor: Color = LIGHTEN,
+    disabledContainerColor: Color = Color.Gray,
+    enabledTextColor: Color = WHITE,
+    disabledTextColor: Color = WHITE_200,
     onClick: () -> Unit
 ) {
     Button(
@@ -25,8 +32,8 @@ fun OPeaceButton(
             .fillMaxWidth()
             .height(54.dp),
         colors = ButtonDefaults.textButtonColors(
-            containerColor = Color(0xff90ff00),
-            disabledContainerColor = Color.Gray,
+            containerColor = containerColor,
+            disabledContainerColor = disabledContainerColor,
         ),
         onClick = onClick,
         enabled = enabled
@@ -36,7 +43,7 @@ fun OPeaceButton(
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W500,
-                color = if (enabled) Color.Black else Color.White,
+                color = if (enabled) enabledTextColor else disabledTextColor,
             )
         )
     }

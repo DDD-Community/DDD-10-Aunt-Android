@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import com.aunt.opeace.login.LoginScreen
 import com.aunt.opeace.signup.SignupScreen
+import com.aunt.opeace.terms.TermsScreen
 import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -48,7 +49,8 @@ class MainActivity : ComponentActivity(), BackHandlerInterface {
         setContent {
             OPeaceTheme {
                 //SignupScreen()
-                LoginScreen()
+                //LoginScreen()
+                TermsScreen()
             }
         }
     }

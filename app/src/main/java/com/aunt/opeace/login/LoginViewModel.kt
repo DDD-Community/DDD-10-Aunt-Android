@@ -1,32 +1,22 @@
 package com.aunt.opeace.login
 
-import androidx.lifecycle.ViewModel
+import com.aunt.opeace.BaseEvent
+import com.aunt.opeace.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+
 @HiltViewModel
-class LoginViewModel @Inject constructor() : ViewModel() {
+class LoginViewModel @Inject constructor() : BaseViewModel() {
     fun handleEvent(event: Event) = when (event) {
-        Event.GoogleLogin -> onClickGoogleLogin()
-        Event.KakaoLogin -> onClickKakoLogin()
-        Event.LoginText -> onClickLoginText()
-    }
-
-    private fun onClickGoogleLogin() {
-        // NOTE : 구글 로그인 연동
-    }
-
-    private fun onClickKakoLogin() {
-        // NOTE : 카카오 로그인 연동
-    }
-
-    private fun onClickLoginText() {
-        // NOTE : 메인?으로 이동
+        Event.OnClickGoogleLogin -> sendEvent(Event.OnClickGoogleLogin)
+        Event.OnClickKakaoLogin -> sendEvent(Event.OnClickKakaoLogin)
+        Event.OnClickLoginText -> sendEvent(Event.OnClickLoginText)
     }
 }
 
-sealed interface Event {
-    object GoogleLogin : Event
-    object KakaoLogin : Event
-    object LoginText : Event
+sealed interface Event : BaseEvent {
+    data object OnClickGoogleLogin : Event
+    data object OnClickKakaoLogin : Event
+    data object OnClickLoginText : Event
 }

@@ -1,17 +1,14 @@
 package com.aunt.opeace
 
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Surface
-import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
-import com.aunt.opeace.login.LoginScreen
-import com.aunt.opeace.signup.SignupScreen
-import com.aunt.opeace.terms.TermsScreen
+import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,7 +47,8 @@ class MainActivity : ComponentActivity(), BackHandlerInterface {
             OPeaceTheme {
                 //SignupScreen()
                 //LoginScreen()
-                TermsScreen()
+                //TermsScreen()
+                startActivity(Intent(this, LoginActivity::class.java))
             }
         }
     }

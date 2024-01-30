@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -23,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.ui.theme.WHITE_300
 import com.aunt.opeace.ui.theme.WHITE_600
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen() {
@@ -33,6 +36,24 @@ fun LoginScreen() {
 
 @Composable
 private fun Content(viewModel: LoginViewModel) {
+    val context = LocalContext.current as LoginInterface
+
+    LaunchedEffect(key1 = viewModel.eventFlow) {
+        viewModel.eventFlow.collectLatest {
+            when (it) {
+                Event.OnClickGoogleLogin -> {
+                    context.googleLogin()
+                }
+
+                Event.OnClickKakaoLogin -> {
+                }
+
+                Event.OnClickLoginText -> {
+                }
+            }
+        }
+    }
+
     Content(onSentEvent = viewModel::handleEvent)
 }
 
@@ -53,13 +74,13 @@ private fun Content(
         Bottom(
             modifier = Modifier.align(alignment = Alignment.BottomCenter),
             onClickGoogleLogin = {
-                onSentEvent(Event.GoogleLogin)
+                onSentEvent(Event.OnClickGoogleLogin)
             },
             onClickKakaoLogin = {
-                onSentEvent(Event.KakaoLogin)
+                onSentEvent(Event.OnClickKakaoLogin)
             },
             onClickLoginText = {
-                onSentEvent(Event.LoginText)
+                onSentEvent(Event.OnClickLoginText)
             }
         )
     }

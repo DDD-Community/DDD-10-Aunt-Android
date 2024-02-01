@@ -28,3 +28,6 @@ val WHITE_600 = Color(0xff292929)
 val BLACK = Color(0xff000000)
 
 val ALERT = Color(0xffFF5050)
+
+val Color_7D7D7D = Color(0xff7D7D7D)
+val Color_303030 = Color(0xff303030)

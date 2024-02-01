@@ -30,6 +30,12 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true" />
+        <activity
+            android:name=".mypage.MyPageActivity"
+            android:exported="true" />
+        <activity
+            android:name=".block.BlockActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

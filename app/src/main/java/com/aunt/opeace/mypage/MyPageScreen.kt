@@ -43,6 +43,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.block.BlockActivity
 import com.aunt.opeace.common.OPeaceTopBar
+import com.aunt.opeace.quit.QuitActivity
+import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_500
@@ -70,32 +72,29 @@ private fun Content(
     sheetState: SheetState
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
+    var dialogType by remember { mutableStateOf(MyPageDialogType.LOGOUT) }
+    var isShowDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = viewModel.eventFlow) {
-        viewModel.eventFlow.collectLatest {
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collectLatest {
             when (it) {
-                is Event.OnClickSheetContentType -> {
-                    when (it.type) {
-                        SheetContentClickType.INFO -> {
-
-                        }
-
-                        SheetContentClickType.BLOCK -> {
-                            showBottomSheet = false
-                            moveToBlockActivity(activity)
-                        }
-
-                        SheetContentClickType.LOGOUT -> {
-
-                        }
-
-                        SheetContentClickType.QUIT -> {
-
-                        }
-                    }
+                Effect.MoveToInfo -> Unit
+                Effect.MoveToBlock -> {
+                    showBottomSheet = false
+                    moveToBlockActivity(activity)
                 }
 
-                else -> Unit
+                Effect.Logout -> {
+                    showBottomSheet = false
+                    isShowDialog = true
+                    dialogType = MyPageDialogType.LOGOUT
+                }
+
+                Effect.Quit -> {
+                    showBottomSheet = false
+                    isShowDialog = true
+                    dialogType = MyPageDialogType.QUIT
+                }
             }
         }
     }
@@ -103,7 +102,22 @@ private fun Content(
     Content(
         sheetState = sheetState,
         showBottomSheet = showBottomSheet,
+        isShowDialog = isShowDialog,
+        dialogType = dialogType,
         onSentEvent = viewModel::handleEvent,
+        onClickDialogLeftButton = {
+            isShowDialog = false
+        },
+        onClickDialogRightButton = {
+            isShowDialog = false
+            if (dialogType.isQuit) {
+                moveToQuitActivity(activity = activity)
+            }
+
+            if (dialogType.isLogout) {
+                // NOTE : 로그아웃 로직 추가
+            }
+        },
         onChangeBottomSheetState = {
             showBottomSheet = it
         }
@@ -115,7 +129,11 @@ private fun Content(
 private fun Content(
     sheetState: SheetState,
     showBottomSheet: Boolean,
+    isShowDialog: Boolean,
+    dialogType: MyPageDialogType,
     onSentEvent: (Event) -> Unit,
+    onClickDialogLeftButton: () -> Unit,
+    onClickDialogRightButton: () -> Unit,
     onChangeBottomSheetState: (Boolean) -> Unit
 ) {
     Scaffold(
@@ -141,6 +159,18 @@ private fun Content(
                     }
                 )
             }
+        }
+
+        if (isShowDialog) {
+            MyPageDialog(
+                dialogType = dialogType,
+                onClickCancel = {
+                    onClickDialogLeftButton()
+                },
+                onClickLogout = {
+                    onClickDialogRightButton()
+                }
+            )
         }
 
         Column(modifier = Modifier.padding(contentPadding)) {
@@ -230,7 +260,7 @@ private fun TextChip(
             fontSize = 12.sp,
             fontWeight = FontWeight.W500,
             color = if (isSelected) {
-                Color(0xff1D1D1D)
+                Color_1D1D1D
             } else {
                 WHITE
             }
@@ -310,4 +340,8 @@ private fun SheetContentText(
 
 private fun moveToBlockActivity(activity: MyPageActivity) {
     activity.startActivity(Intent(activity, BlockActivity::class.java))
+}
+
+private fun moveToQuitActivity(activity: MyPageActivity) {
+    activity.startActivity(Intent(activity, QuitActivity::class.java))
 }

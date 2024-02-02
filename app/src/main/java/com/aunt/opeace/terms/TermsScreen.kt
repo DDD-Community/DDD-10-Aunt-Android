@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import com.aunt.opeace.R
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.ui.theme.BLACK
+import com.aunt.opeace.ui.theme.Color_1D1D1D
+import com.aunt.opeace.ui.theme.Color_9D9D9D
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_300
 
@@ -101,7 +103,7 @@ private fun Content() {
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 29.dp),
             enabled = isChipTerms,
-            containerColor = Color(0xff1D1D1D),
+            containerColor = Color_1D1D1D,
             onClick = {
                 // NOTE : 다음 화면으로 이동
             }
@@ -122,7 +124,7 @@ private fun Title() {
     ) {
         Text(
             text = "이용 약관 동의",
-            color = Color(0xff1D1D1D),
+            color = Color_1D1D1D,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
@@ -169,7 +171,7 @@ private fun Description(
             }
         )
         Divider(
-            modifier = Modifier.background(color = Color(0xffD9D9D9)),
+            modifier = Modifier.background(color = Color_9D9D9D),
             thickness = 2.dp
         )
         SelectChipGroup(
@@ -179,7 +181,7 @@ private fun Description(
                 Text(
                     text = "(필수) 만 14세 이상입니다.",
                     fontSize = 16.sp,
-                    color = Color(0xff1D1D1D)
+                    color = Color_1D1D1D
                 )
             }
         )
@@ -198,7 +200,7 @@ private fun Description(
                         )
                     },
                     fontSize = 16.sp,
-                    color = Color(0xff1D1D1D)
+                    color = Color_1D1D1D
                 )
             }
         )
@@ -217,7 +219,7 @@ private fun Description(
                         )
                     },
                     fontSize = 16.sp,
-                    color = Color(0xff1D1D1D)
+                    color = Color_1D1D1D
                 )
             }
         )
@@ -252,7 +254,7 @@ private fun Chip(
                 color = if (isSelected) {
                     BLACK
                 } else {
-                    Color(0xffD9D9D9)
+                    Color_9D9D9D
                 }
             )
         }

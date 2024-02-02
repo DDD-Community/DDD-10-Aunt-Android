@@ -1,6 +1,5 @@
 package com.aunt.opeace.block
 
-import com.aunt.opeace.BaseEvent
 import com.aunt.opeace.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,6 +15,6 @@ class BlockViewModel @Inject constructor() : BaseViewModel() {
     }
 }
 
-sealed interface Event : BaseEvent {
+sealed interface Event {
     data class OnClickBlockUser(val id: String) : Event
 }

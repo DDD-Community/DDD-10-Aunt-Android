@@ -36,6 +36,10 @@
         <activity
             android:name=".block.BlockActivity"
             android:exported="true" />
+        <activity
+            android:name=".quit.QuitActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

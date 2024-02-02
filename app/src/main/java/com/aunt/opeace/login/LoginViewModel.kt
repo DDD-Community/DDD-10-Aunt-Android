@@ -1,6 +1,6 @@
 package com.aunt.opeace.login
 
-import com.aunt.opeace.BaseEvent
+import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -9,14 +9,30 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor() : BaseViewModel() {
     fun handleEvent(event: Event) = when (event) {
-        Event.OnClickGoogleLogin -> sendEvent(Event.OnClickGoogleLogin)
-        Event.OnClickKakaoLogin -> sendEvent(Event.OnClickKakaoLogin)
-        Event.OnClickLoginText -> sendEvent(Event.OnClickLoginText)
+        is Event.OnClickType -> {
+            setEffect {
+                when (event.type) {
+                    ClickType.GOOGLE -> Effect.GoogleLogin
+                    ClickType.KAKAO -> Effect.KakaoLogin
+                    ClickType.TEXT -> Effect.MoveToMain
+                }
+            }
+        }
     }
 }
 
-sealed interface Event : BaseEvent {
-    data object OnClickGoogleLogin : Event
-    data object OnClickKakaoLogin : Event
-    data object OnClickLoginText : Event
+enum class ClickType {
+    GOOGLE,
+    KAKAO,
+    TEXT
+}
+
+sealed interface Event {
+    data class OnClickType(val type: ClickType) : Event
+}
+
+sealed interface Effect : BaseEffect {
+    data object GoogleLogin : Effect
+    data object KakaoLogin : Effect
+    data object MoveToMain : Effect
 }

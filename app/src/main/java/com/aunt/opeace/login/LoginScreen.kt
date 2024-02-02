@@ -38,18 +38,12 @@ fun LoginScreen() {
 private fun Content(viewModel: LoginViewModel) {
     val context = LocalContext.current as LoginInterface
 
-    LaunchedEffect(key1 = viewModel.eventFlow) {
-        viewModel.eventFlow.collectLatest {
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collectLatest {
             when (it) {
-                Event.OnClickGoogleLogin -> {
-                    context.googleLogin()
-                }
-
-                Event.OnClickKakaoLogin -> {
-                }
-
-                Event.OnClickLoginText -> {
-                }
+                Effect.GoogleLogin -> context.googleLogin()
+                Effect.KakaoLogin -> Unit
+                Effect.MoveToMain -> Unit
             }
         }
     }
@@ -74,13 +68,13 @@ private fun Content(
         Bottom(
             modifier = Modifier.align(alignment = Alignment.BottomCenter),
             onClickGoogleLogin = {
-                onSentEvent(Event.OnClickGoogleLogin)
+                onSentEvent(Event.OnClickType(type = ClickType.GOOGLE))
             },
             onClickKakaoLogin = {
-                onSentEvent(Event.OnClickKakaoLogin)
+                onSentEvent(Event.OnClickType(type = ClickType.KAKAO))
             },
             onClickLoginText = {
-                onSentEvent(Event.OnClickLoginText)
+                onSentEvent(Event.OnClickType(type = ClickType.TEXT))
             }
         )
     }

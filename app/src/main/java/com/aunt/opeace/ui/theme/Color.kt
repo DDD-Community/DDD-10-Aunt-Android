@@ -31,3 +31,5 @@ val ALERT = Color(0xffFF5050)
 
 val Color_7D7D7D = Color(0xff7D7D7D)
 val Color_303030 = Color(0xff303030)
+val Color_1D1D1D = Color(0xff1D1D1D)
+val Color_9D9D9D = Color(0xff9D9D9D)

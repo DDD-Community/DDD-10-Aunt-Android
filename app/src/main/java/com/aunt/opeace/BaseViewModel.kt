@@ -7,14 +7,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 open class BaseViewModel : ViewModel() {
-    private val eventChannel = Channel<BaseEvent>(Channel.BUFFERED)
-    val eventFlow = eventChannel.receiveAsFlow()
+    private val _effect = Channel<BaseEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
 
-    fun sendEvent(event: BaseEvent) {
+
+    protected fun setEffect(builder: () -> BaseEffect) {
         viewModelScope.launch {
-            eventChannel.send(event)
+            _effect.send(element = builder())
         }
     }
 }
 
-interface BaseEvent
+interface BaseEffect

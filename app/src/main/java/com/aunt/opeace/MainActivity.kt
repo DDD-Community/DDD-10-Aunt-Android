@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.animation.doOnEnd
 import com.aunt.opeace.block.BlockActivity
+import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.mypage.MyPageActivity
 import com.aunt.opeace.ui.theme.OPeaceTheme
@@ -51,7 +52,8 @@ class MainActivity : ComponentActivity(), BackHandlerInterface {
                 //LoginScreen()
                 //TermsScreen()
                 //startActivity(Intent(this, LoginActivity::class.java))
-                startActivity(Intent(this, MyPageActivity::class.java))
+                //startActivity(Intent(this, MyPageActivity::class.java))
+                startActivity(Intent(this, HomeActivity::class.java))
             }
         }
     }

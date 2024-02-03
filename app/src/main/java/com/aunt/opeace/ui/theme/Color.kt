@@ -34,6 +34,7 @@ val Color_303030 = Color(0xff303030)
 val Color_1D1D1D = Color(0xff1D1D1D)
 val Color_9D9D9D = Color(0xff9D9D9D)
 val Color_505050 = Color(0xff505050)
+val Color_77777 = Color(0xff777777)
 
 val Color_M = Color(0xffFFE924)
 val Color_X = Color(0xff62FFE3)

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceTextField
 import com.aunt.opeace.common.OPeaceTopBar
@@ -34,11 +35,22 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun WriteScreen() {
-    Content()
+    val viewModel: WriteViewModel = viewModel()
+
+    Content(viewModel = viewModel)
 }
 
 @Composable
-private fun Content() {
+private fun Content(
+    viewModel: WriteViewModel
+) {
+    Content(onSentEvent = viewModel::handleEvent)
+}
+
+@Composable
+private fun Content(
+    onSentEvent: (Event) -> Unit
+) {
     val activity = LocalContext.current as WriteActivity
     val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
     val focusRequester = remember { FocusRequester() }
@@ -71,6 +83,7 @@ private fun Content() {
             value = textFieldValue.value,
             onValueChange = {
                 textFieldValue.value = it
+                onSentEvent(Event.SetText(it.text))
             },
             singleLine = false,
             maxLines = 5,
@@ -92,7 +105,7 @@ private fun Content() {
             enabled = textFieldValue.value.text.length >= 4,
             enabledTextColor = BLACK,
             onClick = {
-
+                onSentEvent(Event.OnClickButton)
             }
         )
     }

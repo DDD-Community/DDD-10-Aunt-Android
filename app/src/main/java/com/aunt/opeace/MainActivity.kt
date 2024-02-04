@@ -8,37 +8,38 @@ import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.animation.doOnEnd
-import com.aunt.opeace.block.BlockActivity
 import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.login.LoginActivity
-import com.aunt.opeace.mypage.MyPageActivity
+import com.aunt.opeace.preference.OPeacePreference
+import com.aunt.opeace.terms.TermsActivity
 import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(), BackHandlerInterface {
+class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var opeacePreference: OPeacePreference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         initSplashScreen()
     }
 
-    override fun exit() {
-        finish()
-    }
-
     private fun initSplashScreen() {
         splashScreen.setOnExitAnimationListener { splashScreenView ->
+            splashScreenView.background = getDrawable(R.drawable.splash)
             ObjectAnimator.ofFloat(
                 splashScreenView,
                 View.TRANSLATION_Y,
                 0f,
-                -splashScreenView.height.toFloat()
+                0f,
+                0f
             ).apply {
                 interpolator = AnticipateInterpolator()
                 duration = 2000L
                 doOnEnd {
-                    splashScreenView.remove()
                     showSignupScreen()
                 }
             }.start()
@@ -48,13 +49,13 @@ class MainActivity : ComponentActivity(), BackHandlerInterface {
     private fun showSignupScreen() {
         setContent {
             OPeaceTheme {
-                //SignupScreen()
-                //LoginScreen()
-                //TermsScreen()
-                //startActivity(Intent(this, LoginActivity::class.java))
-                //startActivity(Intent(this, MyPageActivity::class.java))
-                startActivity(Intent(this, HomeActivity::class.java))
+                if (opeacePreference.isTerms()) {
+                    startActivity(Intent(this, LoginActivity::class.java))
+                } else {
+                    startActivity(Intent(this, TermsActivity::class.java))
+                }
             }
         }
+        finish()
     }
 }

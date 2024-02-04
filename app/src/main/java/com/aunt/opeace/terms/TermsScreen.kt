@@ -1,5 +1,6 @@
 package com.aunt.opeace.terms
 
+import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,8 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.common.OPeaceButton
+import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.ui.theme.BLACK
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.Color_9D9D9D
@@ -40,11 +45,14 @@ import com.aunt.opeace.ui.theme.WHITE_300
 
 @Composable
 fun TermsScreen() {
-    Content()
+    val viewModel: TermsViewModel = viewModel()
+
+    Content(viewModel = viewModel)
 }
 
 @Composable
-private fun Content() {
+private fun Content(viewModel: TermsViewModel) {
+    val activity = LocalContext.current as TermsActivity
     var isChipTerms by remember { mutableStateOf(false) }
     var isChipAge by remember { mutableStateOf(false) }
     var isChipService by remember { mutableStateOf(false) }
@@ -105,7 +113,8 @@ private fun Content() {
             enabled = isChipTerms,
             containerColor = Color_1D1D1D,
             onClick = {
-                // NOTE : 다음 화면으로 이동
+                viewModel.handleEvent(event = Evet.OnClickNext)
+                moveToLogin(activity = activity)
             }
         )
     }
@@ -264,4 +273,8 @@ private fun Chip(
             contentDescription = null
         )
     }
+}
+
+private fun moveToLogin(activity: TermsActivity) {
+    activity.startActivity(Intent(activity, LoginActivity::class.java))
 }

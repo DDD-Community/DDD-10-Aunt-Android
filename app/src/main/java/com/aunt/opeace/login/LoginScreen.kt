@@ -1,5 +1,6 @@
 package com.aunt.opeace.login
 
+import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
+import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.ui.theme.WHITE_300
 import com.aunt.opeace.ui.theme.WHITE_600
 import kotlinx.coroutines.flow.collectLatest
@@ -43,7 +45,7 @@ private fun Content(viewModel: LoginViewModel) {
             when (it) {
                 Effect.GoogleLogin -> context.googleLogin()
                 Effect.KakaoLogin -> Unit
-                Effect.MoveToMain -> Unit
+                Effect.MoveToMain -> context.goHome()
             }
         }
     }

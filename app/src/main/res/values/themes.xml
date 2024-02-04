@@ -2,10 +2,4 @@
 <resources>
 
     <style name="Theme.OPeace" parent="android:Theme.Material.Light.NoActionBar" />
-
-    <style name="Theme.OPeace.Splash" parent="Theme.OPeace">
-        <item name="android:windowBackground">@drawable/ic_launcher_background</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowNoTitle">true</item>
-    </style>
 </resources>

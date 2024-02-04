@@ -1,12 +1,14 @@
 package com.aunt.opeace.login
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import com.aunt.opeace.home.HomeActivity
 import com.google.android.gms.auth.api.identity.GetSignInIntentRequest
 import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +20,7 @@ class LoginActivity : ComponentActivity(), LoginInterface {
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            // NOTE : 다음 화면으로 이동
+            // NOTE : 서버 통신 후 ? 완료 되면 Screen에서 SignupActivity로 이동
             println("$TAG loginResultHandler() success: ${result.data}")
         }
     }
@@ -46,6 +48,11 @@ class LoginActivity : ComponentActivity(), LoginInterface {
             .addOnFailureListener { e ->
                 e.printStackTrace()
             }
+    }
+
+    override fun goHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 
     companion object {

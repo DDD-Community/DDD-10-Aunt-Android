@@ -28,7 +28,7 @@ fun Flippable(
     modifier: Modifier = Modifier,
     frontSide: @Composable () -> Unit,
     backSide: @Composable () -> Unit,
-    flipController: FlippableController,
+    flipController: FlipController,
     clockwise: Boolean = true,
 ) {
     val flipDurationMs = 400
@@ -207,7 +207,7 @@ enum class FlippableState {
     BACK
 }
 
-class FlippableController {
+class FlipController {
 
     private val _flipRequests = MutableSharedFlow<FlippableState>(extraBufferCapacity = 1)
     internal val flipRequests = _flipRequests.asSharedFlow()

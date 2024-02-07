@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
+import com.aunt.opeace.common.Flippable
+import com.aunt.opeace.common.FlipController
 import com.aunt.opeace.common.OPeaceCard
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.model.CardItem
@@ -56,7 +59,7 @@ fun HomeScreen() {
 @Composable
 private fun Content(
     viewModel: HomeViewModel,
-    activity: HomeActivity
+    activity: HomeActivity,
 ) {
     val list = viewModel.state.collectAsState().value.list
 
@@ -71,7 +74,7 @@ private fun Content(
 private fun Content(
     activity: HomeActivity,
     isLogin: Boolean,
-    list: List<CardItem>
+    list: List<CardItem>,
 ) {
     Box(
         modifier = Modifier
@@ -94,20 +97,39 @@ private fun Content(
                 }
             }
             items(list.size) {
-                OPeaceCard(
-                    nickname = list[it].nickname,
-                    job = list[it].job,
-                    age = list[it].age,
-                    image = "",
-                    title = list[it].title,
-                    firstWord = list[it].firstWord,
-                    firstNumber = list[it].firstNumber,
-                    secondWord = list[it].secondWord,
-                    secondNumber = list[it].secondNumber,
-                    onClickFirstButton = {
-
+                val flipController = remember(key1 = it) { FlipController() }
+                Flippable(
+                    frontSide = {
+                        OPeaceCard(
+                            nickname = list[it].nickname,
+                            job = list[it].job,
+                            age = list[it].age,
+                            image = "",
+                            title = list[it].title,
+                            firstWord = list[it].firstWord,
+                            firstNumber = list[it].firstNumber,
+                            secondWord = list[it].secondWord,
+                            secondNumber = list[it].secondNumber,
+                            onClickFirstButton = { flipController.flip() },
+                            onClickSecondButton = { }
+                        )
                     },
-                    onClickSecondButton = { }
+                    backSide = {
+                        OPeaceCard(
+                            nickname = list[it].nickname,
+                            job = list[it].job,
+                            age = list[it].age,
+                            image = "",
+                            title = list[it].title,
+                            firstWord = list[it].firstWord,
+                            firstNumber = list[it].firstNumber,
+                            secondWord = list[it].secondWord,
+                            secondNumber = list[it].secondNumber,
+                            onClickFirstButton = { },
+                            onClickSecondButton = { flipController.flip() }
+                        )
+                    },
+                    flipController = flipController
                 )
             }
         }
@@ -135,7 +157,7 @@ private fun Content(
 @Composable
 private fun Header(
     modifier: Modifier = Modifier,
-    onClickProfile: () -> Unit
+    onClickProfile: () -> Unit,
 ) {
     // NOTE : 계열, Z세대, 최신순은 디자인 요소가 부족하여 제외하고 개발
     Row(

@@ -29,10 +29,10 @@ fun Flippable(
     frontSide: @Composable () -> Unit,
     backSide: @Composable () -> Unit,
     flipController: FlipController,
-    clockwise: Boolean = true,
+    initialState: FlippableState= FlippableState.FRONT,
 ) {
     val flipDurationMs = 400
-    var flippableState by remember { mutableStateOf(FlippableState.FRONT) }
+    var flippableState by remember { mutableStateOf(initialState) }
     val transition: Transition<FlippableState> = updateTransition(
         targetState = flippableState,
         label = "Flip Transition",
@@ -181,7 +181,7 @@ fun Flippable(
         Box(modifier = Modifier
             .graphicsLayer {
                 this.cameraDistance = 100f
-                rotationY = if (clockwise) backRotation else -backRotation
+                rotationY = backRotation
             }
             .alpha(backOpacity)
             .zIndex(1F - backOpacity)
@@ -192,7 +192,7 @@ fun Flippable(
         Box(modifier = Modifier
             .graphicsLayer {
                 this.cameraDistance = 100f
-                rotationY = if (clockwise) frontRotation else -frontRotation
+                rotationY = frontRotation
             }
             .alpha(frontOpacity)
             .zIndex(1F - frontRotation)

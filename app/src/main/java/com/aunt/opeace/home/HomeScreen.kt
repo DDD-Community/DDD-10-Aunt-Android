@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import com.aunt.opeace.R
 import com.aunt.opeace.common.Flippable
 import com.aunt.opeace.common.FlipController
 import com.aunt.opeace.common.OPeaceCard
+import com.aunt.opeace.common.OPeaceSelectedCard
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.model.CardItem
 import com.aunt.opeace.mypage.MyPageActivity
@@ -84,7 +86,8 @@ private fun Content(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 20.dp)
         ) {
             item {
                 Header {
@@ -111,11 +114,11 @@ private fun Content(
                             secondWord = list[it].secondWord,
                             secondNumber = list[it].secondNumber,
                             onClickFirstButton = { flipController.flip() },
-                            onClickSecondButton = { }
+                            onClickSecondButton = { flipController.flip() }
                         )
                     },
                     backSide = {
-                        OPeaceCard(
+                        OPeaceSelectedCard(
                             nickname = list[it].nickname,
                             job = list[it].job,
                             age = list[it].age,
@@ -123,10 +126,14 @@ private fun Content(
                             title = list[it].title,
                             firstWord = list[it].firstWord,
                             firstNumber = list[it].firstNumber,
+                            firstPercent = "70%",
+                            firstResultList = emptyList(),
                             secondWord = list[it].secondWord,
                             secondNumber = list[it].secondNumber,
-                            onClickFirstButton = { },
-                            onClickSecondButton = { flipController.flip() }
+                            secondPercent = "30%",
+                            secondResultList = emptyList(),
+                            respondCount = 100,
+                            likeCount = 30
                         )
                     },
                     flipController = flipController

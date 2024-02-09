@@ -66,6 +66,17 @@ private fun Content(viewModel: TermsViewModel) {
         isChipTerms = isChipAge && isChipService && isChipInfo
     }
 
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect {
+            when (it) {
+                Effect.MoveToLogin -> {
+                    moveToLogin(activity = activity)
+                    activity.finish()
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,8 +124,7 @@ private fun Content(viewModel: TermsViewModel) {
             enabled = isChipTerms,
             containerColor = Color_1D1D1D,
             onClick = {
-                viewModel.handleEvent(event = Evet.OnClickNext)
-                moveToLogin(activity = activity)
+                viewModel.handleEvent(event = Event.OnClickNext)
             }
         )
     }

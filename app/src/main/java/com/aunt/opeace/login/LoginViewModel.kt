@@ -15,6 +15,7 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
                     ClickType.GOOGLE -> Effect.GoogleLogin
                     ClickType.KAKAO -> Effect.KakaoLogin
                     ClickType.TEXT -> Effect.MoveToMain
+                    ClickType.EMAIL -> Effect.MoveToEmailInput
                 }
             }
         }
@@ -24,7 +25,8 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
 enum class ClickType {
     GOOGLE,
     KAKAO,
-    TEXT
+    TEXT,
+    EMAIL
 }
 
 sealed interface Event {
@@ -35,4 +37,5 @@ sealed interface Effect : BaseEffect {
     data object GoogleLogin : Effect
     data object KakaoLogin : Effect
     data object MoveToMain : Effect
+    data object MoveToEmailInput : Effect
 }

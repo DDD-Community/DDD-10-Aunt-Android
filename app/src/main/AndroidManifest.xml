@@ -49,8 +49,15 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".signup.SignupActivity"
+            android:exported="true" />
+        <activity
             android:name=".terms.TermsActivity"
             android:exported="true" />
+        <activity
+            android:name=".login.email.EmailInputActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

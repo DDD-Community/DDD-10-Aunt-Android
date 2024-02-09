@@ -10,6 +10,10 @@ interface OPeacePreference {
     fun setTerms()
     fun isLogin(): Boolean
     fun setLogin()
+    fun setNickname(nickname: String)
+    fun getNickname(): String
+    fun isSignup() : Boolean
+    fun setSignup()
 }
 
 class OPeacePreferenceImpl @Inject constructor(
@@ -39,6 +43,23 @@ class OPeacePreferenceImpl @Inject constructor(
         }
     }
 
-    companion object {
+    override fun setNickname(nickname: String) {
+        preference.edit {
+            putString("key_nickname", nickname)
+        }
+    }
+
+    override fun getNickname(): String {
+        return preference.getString("key_nickname", "") ?: ""
+    }
+
+    override fun isSignup(): Boolean {
+        return preference.getBoolean("key_signup", false)
+    }
+
+    override fun setSignup() {
+        preference.edit {
+            putBoolean("key_signup", true)
+        }
     }
 }

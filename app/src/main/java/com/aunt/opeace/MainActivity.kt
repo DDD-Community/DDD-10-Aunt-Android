@@ -11,6 +11,7 @@ import androidx.core.animation.doOnEnd
 import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.preference.OPeacePreference
+import com.aunt.opeace.signup.SignupActivity
 import com.aunt.opeace.terms.TermsActivity
 import com.aunt.opeace.ui.theme.OPeaceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,10 +50,19 @@ class MainActivity : ComponentActivity() {
     private fun showSignupScreen() {
         setContent {
             OPeaceTheme {
-                if (opeacePreference.isTerms()) {
-                    startActivity(Intent(this, LoginActivity::class.java))
-                } else {
-                    startActivity(Intent(this, TermsActivity::class.java))
+                when {
+                    opeacePreference.isTerms().not() -> {
+                        startActivity(Intent(this, TermsActivity::class.java))
+                    }
+                    opeacePreference.isLogin().not() -> {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    }
+                    opeacePreference.isSignup().not() -> {
+                        startActivity(Intent(this, SignupActivity::class.java))
+                    }
+                    else -> {
+                        startActivity(Intent(this, HomeActivity::class.java))
+                    }
                 }
             }
         }

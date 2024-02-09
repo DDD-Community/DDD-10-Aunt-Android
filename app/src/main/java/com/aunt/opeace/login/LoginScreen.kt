@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.home.HomeActivity
+import com.aunt.opeace.login.email.EmailInputActivity
 import com.aunt.opeace.ui.theme.WHITE_300
 import com.aunt.opeace.ui.theme.WHITE_600
 import kotlinx.coroutines.flow.collectLatest
@@ -38,14 +39,16 @@ fun LoginScreen() {
 
 @Composable
 private fun Content(viewModel: LoginViewModel) {
-    val context = LocalContext.current as LoginInterface
+    //val context = LocalContext.current as LoginInterface
+    val activity = LocalContext.current as LoginActivity
 
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collectLatest {
             when (it) {
-                Effect.GoogleLogin -> context.googleLogin()
+                Effect.GoogleLogin,
                 Effect.KakaoLogin -> Unit
-                Effect.MoveToMain -> context.goHome()
+                Effect.MoveToMain -> moveToHome(activity = activity)
+                Effect.MoveToEmailInput -> moveToEmailInput(activity = activity)
             }
         }
     }
@@ -77,6 +80,9 @@ private fun Content(
             },
             onClickLoginText = {
                 onSentEvent(Event.OnClickType(type = ClickType.TEXT))
+            },
+            onClickEmailSignup =  {
+                onSentEvent(Event.OnClickType(type = ClickType.EMAIL))
             }
         )
     }
@@ -87,15 +93,27 @@ private fun Bottom(
     modifier: Modifier = Modifier,
     onClickGoogleLogin: () -> Unit,
     onClickKakaoLogin: () -> Unit,
-    onClickLoginText: () -> Unit
+    onClickLoginText: () -> Unit,
+    onClickEmailSignup: () -> Unit
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoginLogo(
-            onClickGoogleLogin = onClickGoogleLogin,
-            onClickKakaoLogin = onClickKakaoLogin
+//        LoginLogo(
+//            onClickGoogleLogin = onClickGoogleLogin,
+//            onClickKakaoLogin = onClickKakaoLogin
+//        )
+        // 서버 구현 안되서 그냥 파이버페이스 사용
+        Text(
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .clickable(onClick = onClickEmailSignup),
+            text = "이메일로 가입하기",
+            color = WHITE_300,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.W500,
+            textDecoration = TextDecoration.Underline
         )
         Text(
             modifier = Modifier
@@ -141,4 +159,12 @@ private fun LoginLogo(
         painter = painterResource(id = drawableRes),
         contentDescription = null
     )
+}
+
+private fun moveToEmailInput(activity: LoginActivity) {
+    activity.startActivity(Intent(activity, EmailInputActivity::class.java))
+}
+
+private fun moveToHome(activity: LoginActivity) {
+    activity.startActivity(Intent(activity, HomeActivity::class.java))
 }

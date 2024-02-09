@@ -2,12 +2,24 @@ package com.aunt.opeace.login
 
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.preference.OPeacePreference
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 
 @HiltViewModel
-class LoginViewModel @Inject constructor() : BaseViewModel() {
+class LoginViewModel @Inject constructor(
+    oPeacePreference: OPeacePreference
+) : BaseViewModel() {
+    private val _state = MutableStateFlow(State())
+    val state = _state.asStateFlow()
+
+    init {
+        _state.value = _state.value.copy(nickname = oPeacePreference.getNickname())
+    }
+
     fun handleEvent(event: Event) = when (event) {
         is Event.OnClickType -> {
             setEffect {
@@ -21,6 +33,8 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
         }
     }
 }
+
+data class State(val nickname: String = "")
 
 enum class ClickType {
     GOOGLE,

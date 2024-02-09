@@ -35,18 +35,6 @@ class LoginActivity : ComponentActivity(), LoginInterface {
     }
 
     override fun googleLogin() {
-        val auth = Firebase.auth
-        auth.createUserWithEmailAndPassword("skadnwnd23@naver.com", "test")
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    val user = auth.currentUser
-                    println("???????? user: $user")
-                } else {
-                    // If sign in fails, display a message to the user.
-                    println("???? fail")
-                }
-            }
         //requestGoogleLogin()
     }
 

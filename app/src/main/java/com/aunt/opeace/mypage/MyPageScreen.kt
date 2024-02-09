@@ -43,6 +43,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.block.BlockActivity
 import com.aunt.opeace.common.OPeaceTopBar
+import com.aunt.opeace.login.LoginActivity
+import com.aunt.opeace.login.email.EmailInputActivity
 import com.aunt.opeace.quit.QuitActivity
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.LIGHTEN
@@ -115,7 +117,7 @@ private fun Content(
             }
 
             if (dialogType.isLogout) {
-                // NOTE : 로그아웃 로직 추가
+                moveToLogin(activity = activity)
             }
         },
         onChangeBottomSheetState = {
@@ -344,4 +346,8 @@ private fun moveToBlockActivity(activity: MyPageActivity) {
 
 private fun moveToQuitActivity(activity: MyPageActivity) {
     activity.startActivity(Intent(activity, QuitActivity::class.java))
+}
+
+private fun moveToLogin(activity: MyPageActivity) {
+    activity.startActivity(Intent(activity, LoginActivity::class.java))
 }

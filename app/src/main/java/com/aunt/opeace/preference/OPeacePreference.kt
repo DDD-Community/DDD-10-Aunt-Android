@@ -9,11 +9,13 @@ interface OPeacePreference {
     fun isTerms(): Boolean
     fun setTerms()
     fun isLogin(): Boolean
-    fun setLogin()
+    fun setLogin(isLogin: Boolean)
     fun setNickname(nickname: String)
     fun getNickname(): String
     fun isSignup() : Boolean
     fun setSignup()
+
+    fun deleteAll()
 }
 
 class OPeacePreferenceImpl @Inject constructor(
@@ -37,9 +39,9 @@ class OPeacePreferenceImpl @Inject constructor(
         return preference.getBoolean("key_login", false)
     }
 
-    override fun setLogin() {
+    override fun setLogin(isLogin: Boolean) {
         preference.edit {
-            putBoolean("key_login", true)
+            putBoolean("key_login", isLogin)
         }
     }
 
@@ -61,5 +63,9 @@ class OPeacePreferenceImpl @Inject constructor(
         preference.edit {
             putBoolean("key_signup", true)
         }
+    }
+
+    override fun deleteAll() {
+        preference.edit().clear().apply()
     }
 }

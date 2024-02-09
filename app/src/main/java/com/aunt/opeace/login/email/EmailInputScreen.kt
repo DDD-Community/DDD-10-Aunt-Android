@@ -36,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.common.OPeaceButton
 import com.aunt.opeace.common.OPeaceTextField
 import com.aunt.opeace.common.OPeaceTopBar
+import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.signup.SignupActivity
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_600
@@ -63,15 +64,23 @@ fun EmailInputScreen() {
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collectLatest {
             when (it) {
-                Effect.LoginSuccess -> {
+                is Effect.LoginSuccess -> {
                     keyboardController?.hide()
                     delay(200)
-                    activity.startActivity(Intent(activity, SignupActivity::class.java))
+                    activity.startActivity(
+                        Intent(
+                            activity, if (it.loginType.isCreate) {
+                                SignupActivity::class.java
+                            } else {
+                                HomeActivity::class.java
+                            }
+                        )
+                    )
                     activity.finish()
                 }
 
-                Effect.LoginFail -> {
-                    Toast.makeText(activity, "사용 할 수 없는 이메일입니다.", Toast.LENGTH_SHORT).show()
+                is Effect.LoginFail -> {
+                    Toast.makeText(activity, it.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }

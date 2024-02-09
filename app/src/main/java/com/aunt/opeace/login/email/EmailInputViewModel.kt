@@ -1,22 +1,22 @@
 package com.aunt.opeace.login.email
 
-import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.preference.OPeacePreference
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EmailInputViewModel @Inject constructor(
     private val preference: OPeacePreference
 ) : BaseViewModel() {
+    private val opeaceAuth = Firebase.auth
+
     private val _state = MutableStateFlow(State())
     val state get() = _state.asStateFlow()
 
@@ -32,7 +32,7 @@ class EmailInputViewModel @Inject constructor(
         Event.OnClickLogin -> requestLogin()
     }
 
-    private fun requestLogin() {
+    private fun requestLogin(user: FirebaseUser? = Firebase.auth.currentUser) {
         if (state.value.email.isBlank() || state.value.password.isBlank()) {
             return
         }
@@ -41,21 +41,37 @@ class EmailInputViewModel @Inject constructor(
         val password = state.value.password
 
         setLoading(isLoading = true)
-        Firebase.auth.createUserWithEmailAndPassword(
-            email,
-            password
-        ).addOnCompleteListener {
+        val taskResult = if (user != null) {
+            opeaceAuth.signInWithEmailAndPassword(
+                email,
+                password
+            )
+        } else {
+            opeaceAuth.createUserWithEmailAndPassword(
+                email,
+                password
+            )
+        }
+        taskResult.addOnCompleteListener {
             // https://firebase.google.com/docs/auth/android/start
             if (it.isSuccessful) {
-                preference.setLogin()
-                setEffect { Effect.LoginSuccess }
+                preference.setLogin(true)
+                setEffect {
+                    Effect.LoginSuccess(
+                        loginType = if (user != null) {
+                            LoginType.SIGNIN
+                        } else {
+                            LoginType.CREATE
+                        }
+                    )
+                }
             } else {
-                setEffect { Effect.LoginFail }
+                setEffect { Effect.LoginFail(it.exception?.message ?: "사용 할 수 없는 이메일입니다.") }
             }
             setLoading(isLoading = false)
         }.addOnFailureListener {
             setLoading(isLoading = false)
-            setEffect { Effect.LoginFail }
+            setEffect { Effect.LoginFail(it.message ?: "사용 할 수 없는 이메일입니다.") }
         }
     }
 
@@ -77,6 +93,13 @@ sealed interface Event {
 }
 
 sealed interface Effect : BaseEffect {
-    data object LoginSuccess: Effect
-    data object LoginFail : Effect
+    data class LoginSuccess(val loginType: LoginType) : Effect
+    data class LoginFail(val message: String) : Effect
+}
+
+enum class LoginType {
+    SIGNIN,
+    CREATE;
+
+    val isCreate: Boolean get() = this == CREATE
 }

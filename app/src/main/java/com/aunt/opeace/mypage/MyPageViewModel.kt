@@ -2,22 +2,28 @@ package com.aunt.opeace.mypage
 
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.preference.OPeacePreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MyPageViewModel @Inject constructor() : BaseViewModel() {
+class MyPageViewModel @Inject constructor(
+    private val oPeacePreference: OPeacePreference
+) : BaseViewModel() {
     fun handleEvent(event: Event) = when (event) {
         is Event.OnClickSheetContentType -> {
-            setEffect {
-                when (event.type) {
-                    SheetContentClickType.INFO -> Effect.MoveToInfo
-                    SheetContentClickType.BLOCK -> Effect.MoveToBlock
-                    SheetContentClickType.LOGOUT -> Effect.Logout
-                    SheetContentClickType.QUIT -> Effect.Quit
-                }
+            when (event.type) {
+                SheetContentClickType.INFO -> setEffect { Effect.MoveToInfo }
+                SheetContentClickType.BLOCK -> setEffect { Effect.MoveToBlock }
+                SheetContentClickType.LOGOUT -> onClickLogout()
+                SheetContentClickType.QUIT -> setEffect { Effect.Quit }
             }
         }
+    }
+
+    private fun onClickLogout() {
+        oPeacePreference.setLogin(false)
+        setEffect { Effect.Logout }
     }
 }
 

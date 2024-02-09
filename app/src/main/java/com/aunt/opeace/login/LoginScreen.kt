@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,23 +42,26 @@ fun LoginScreen() {
 private fun Content(viewModel: LoginViewModel) {
     //val context = LocalContext.current as LoginInterface
     val activity = LocalContext.current as LoginActivity
+    val nickname = viewModel.state.collectAsState().value.nickname
 
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collectLatest {
             when (it) {
                 Effect.GoogleLogin,
                 Effect.KakaoLogin -> Unit
+
                 Effect.MoveToMain -> moveToHome(activity = activity)
                 Effect.MoveToEmailInput -> moveToEmailInput(activity = activity)
             }
         }
     }
 
-    Content(onSentEvent = viewModel::handleEvent)
+    Content(nickname = nickname, onSentEvent = viewModel::handleEvent)
 }
 
 @Composable
 private fun Content(
+    nickname: String,
     onSentEvent: (Event) -> Unit
 ) {
     Box(
@@ -72,6 +76,7 @@ private fun Content(
         )
         Bottom(
             modifier = Modifier.align(alignment = Alignment.BottomCenter),
+            nickname = nickname,
             onClickGoogleLogin = {
                 onSentEvent(Event.OnClickType(type = ClickType.GOOGLE))
             },
@@ -81,7 +86,7 @@ private fun Content(
             onClickLoginText = {
                 onSentEvent(Event.OnClickType(type = ClickType.TEXT))
             },
-            onClickEmailSignup =  {
+            onClickEmailSignup = {
                 onSentEvent(Event.OnClickType(type = ClickType.EMAIL))
             }
         )
@@ -91,6 +96,7 @@ private fun Content(
 @Composable
 private fun Bottom(
     modifier: Modifier = Modifier,
+    nickname: String,
     onClickGoogleLogin: () -> Unit,
     onClickKakaoLogin: () -> Unit,
     onClickLoginText: () -> Unit,
@@ -109,7 +115,11 @@ private fun Bottom(
             modifier = Modifier
                 .padding(bottom = 10.dp)
                 .clickable(onClick = onClickEmailSignup),
-            text = "이메일로 가입하기",
+            text = if (nickname.isBlank()) {
+                "이메일로 가입하기"
+            } else {
+                "로그인"
+            },
             color = WHITE_300,
             fontSize = 16.sp,
             fontWeight = FontWeight.W500,

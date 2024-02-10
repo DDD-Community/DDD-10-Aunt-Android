@@ -34,7 +34,7 @@ fun OPeaceCard(
     firstNumber: String,
     secondWord: String,
     secondNumber: String,
-    isMore: Boolean = true,
+    isMore: Boolean = false,
     onClickFirstButton: () -> Unit,
     onClickSecondButton: () -> Unit,
     onClickMore: (() -> Unit)? = null

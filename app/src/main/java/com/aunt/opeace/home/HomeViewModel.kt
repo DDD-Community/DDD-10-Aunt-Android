@@ -56,10 +56,19 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
     }
 
     private fun updateCard(card: CardItem) {
+        if (card.id.isBlank()) {
+            return
+        }
+
         viewModelScope.launch {
-            database.collection(COLLECTION_CARD)
-                .document(card.id)
-                .update("likeCount", card.likeCount + 1)
+            runCatching {
+                database.collection(COLLECTION_CARD)
+                    .document(card.id)
+                    .update("likeCount", card.likeCount + 1)
+            }
+                .onFailure {
+                    println("???????????? error: ${it.message}")
+                }
         }
         updateLikeCount(targetCard = card)
     }

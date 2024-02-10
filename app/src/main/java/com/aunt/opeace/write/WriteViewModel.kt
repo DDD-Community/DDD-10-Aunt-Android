@@ -13,8 +13,16 @@ class WriteViewModel @Inject constructor() : BaseViewModel() {
 
     fun handleEvent(event: Event) = when (event) {
         is Event.SetText -> setText(text = event.text)
+        is Event.SetFirstAnswer -> {
+            _state.value = _state.value.copy(firstAnswer = event.answer)
+        }
+
+        is Event.SetSecondAnswer -> {
+            _state.value = _state.value.copy(secondAnswer = event.answer)
+        }
+
         Event.OnClickButton -> {
-            // server
+            // save firestore
         }
     }
 
@@ -24,10 +32,14 @@ class WriteViewModel @Inject constructor() : BaseViewModel() {
 }
 
 data class State(
-    val text: String = ""
+    val text: String = "",
+    val firstAnswer: String = "",
+    val secondAnswer: String = ""
 )
 
 sealed interface Event {
     data class SetText(val text: String) : Event
+    data class SetFirstAnswer(val answer: String) : Event
+    data class SetSecondAnswer(val answer: String) : Event
     data object OnClickButton : Event
 }

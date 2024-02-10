@@ -46,7 +46,7 @@ fun OPeaceSelectedCard(
     secondWord: String,
     secondNumber: String,
     secondPercent: String,
-    isMore: Boolean = true,
+    isMore: Boolean = false,
     firstResultList: List<Pair<String, Int>>,
     secondResultList: List<Pair<String, Int>>,
     respondCount: Int,

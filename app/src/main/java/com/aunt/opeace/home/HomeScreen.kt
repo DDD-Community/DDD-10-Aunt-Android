@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
-import com.aunt.opeace.common.Flippable
 import com.aunt.opeace.common.FlipController
+import com.aunt.opeace.common.Flippable
 import com.aunt.opeace.common.OPeaceCard
 import com.aunt.opeace.common.OPeaceSelectedCard
 import com.aunt.opeace.login.LoginActivity
@@ -63,12 +64,15 @@ private fun Content(
     viewModel: HomeViewModel,
     activity: HomeActivity,
 ) {
-    val list = viewModel.state.collectAsState().value.list
+    val cards = viewModel.state.collectAsState().value.cards
+    val isLoading = viewModel.state.collectAsState().value.isLoading
 
     Content(
         activity = activity,
         isLogin = true,
-        list = list
+        isLoading = isLoading,
+        cards = cards,
+        onSentEvent = viewModel::handleEvent
     )
 }
 
@@ -76,7 +80,9 @@ private fun Content(
 private fun Content(
     activity: HomeActivity,
     isLogin: Boolean,
-    list: List<CardItem>,
+    isLoading: Boolean,
+    cards: List<CardItem>,
+    onSentEvent: (Event) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -99,41 +105,44 @@ private fun Content(
                     }
                 }
             }
-            items(list.size) {
+            items(cards.size) {
                 val flipController = remember(key1 = it) { FlipController() }
                 Flippable(
                     frontSide = {
                         OPeaceCard(
-                            nickname = list[it].nickname,
-                            job = list[it].job,
-                            age = list[it].age,
+                            nickname = cards[it].nickname,
+                            job = cards[it].job,
+                            age = cards[it].age,
                             image = "",
-                            title = list[it].title,
-                            firstWord = list[it].firstWord,
-                            firstNumber = list[it].firstNumber,
-                            secondWord = list[it].secondWord,
-                            secondNumber = list[it].secondNumber,
+                            title = cards[it].title,
+                            firstWord = cards[it].firstWord,
+                            firstNumber = cards[it].firstNumber,
+                            secondWord = cards[it].secondWord,
+                            secondNumber = cards[it].secondNumber,
                             onClickFirstButton = { flipController.flip() },
                             onClickSecondButton = { flipController.flip() }
                         )
                     },
                     backSide = {
                         OPeaceSelectedCard(
-                            nickname = list[it].nickname,
-                            job = list[it].job,
-                            age = list[it].age,
+                            nickname = cards[it].nickname,
+                            job = cards[it].job,
+                            age = cards[it].age,
                             image = "",
-                            title = list[it].title,
-                            firstWord = list[it].firstWord,
-                            firstNumber = list[it].firstNumber,
-                            firstPercent = "70%",
-                            firstResultList = emptyList(),
-                            secondWord = list[it].secondWord,
-                            secondNumber = list[it].secondNumber,
-                            secondPercent = "30%",
-                            secondResultList = emptyList(),
-                            respondCount = 100,
-                            likeCount = 30
+                            title = cards[it].title,
+                            firstWord = cards[it].firstWord,
+                            firstNumber = cards[it].firstNumber,
+                            firstPercent = cards[it].firstPercent,
+                            firstResultList = cards[it].firstResult,
+                            secondWord = cards[it].secondWord,
+                            secondNumber = cards[it].secondNumber,
+                            secondPercent = cards[it].secondPercent,
+                            secondResultList = cards[it].secondResult,
+                            respondCount = cards[it].respondCount,
+                            likeCount = cards[it].likeCount,
+                            onClickLike = {
+                                onSentEvent(Event.OnClickLike(cards[it]))
+                            }
                         )
                     },
                     flipController = flipController
@@ -158,6 +167,15 @@ private fun Content(
             fontSize = 20.sp,
             textAlign = TextAlign.Center
         )
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(top = 40.dp),
+                color = WHITE
+            )
+        }
     }
 }
 

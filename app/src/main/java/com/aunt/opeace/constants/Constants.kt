@@ -72,3 +72,30 @@ val wordList = listOf(
     "한식" to "양식",
     "유럽 여행" to "아시아 여행"
 )
+
+val firstPercentList = listOf(
+    100,
+    90,
+    80,
+    70,
+    60,
+    50,
+    40,
+    30,
+    20,
+    10
+)
+
+val secondPercentList = listOf(
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100
+)

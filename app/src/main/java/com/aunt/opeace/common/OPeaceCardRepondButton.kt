@@ -124,7 +124,13 @@ private fun DrawPercent(list: List<Pair<String, Int>>) {
         list.take(4).forEachIndexed { _, (age, percent) ->
             Spacer(
                 modifier = Modifier
-                    .weight(percent / 100f)
+                    .weight(
+                        if (percent != 0) {
+                            percent / 100f
+                        } else {
+                            1f
+                        }
+                    )
                     .background(
                         when (age) {
                             "Z세대" -> LIGHTEN

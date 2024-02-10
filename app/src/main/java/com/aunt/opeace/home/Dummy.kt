@@ -1,8 +1,10 @@
 package com.aunt.opeace.home
 
 import com.aunt.opeace.constants.ageList
+import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.constants.jobList
 import com.aunt.opeace.constants.nicknameList
+import com.aunt.opeace.constants.secondPercentList
 import com.aunt.opeace.constants.titleList
 import com.aunt.opeace.constants.wordList
 import com.aunt.opeace.model.CardItem
@@ -44,4 +46,12 @@ private fun getTitle(targetIndex: Int): String {
 
 private fun getWords(targetIndex: Int): Pair<String, String> {
     return wordList[targetIndex]
+}
+
+private fun getRandomFirstPercent(targetIndex: Int): Int {
+    return firstPercentList[targetIndex]
+}
+
+private fun getRandomSecondPercent(targetIndex: Int): Int {
+    return secondPercentList[targetIndex]
 }

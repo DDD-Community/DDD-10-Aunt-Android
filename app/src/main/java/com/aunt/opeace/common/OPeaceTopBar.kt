@@ -19,12 +19,13 @@ import com.aunt.opeace.R
 
 @Composable
 fun OPeaceTopBar(
+    modifier: Modifier = Modifier,
     title: String = "",
     @DrawableRes leftImageResId: Int = R.drawable.ic_24_previous,
     onClickLeftImage: () -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
     ) {

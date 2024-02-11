@@ -3,6 +3,7 @@ package com.aunt.opeace.signup
 import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_USER
 import com.aunt.opeace.preference.OPeacePreference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
@@ -79,8 +80,10 @@ class SignupViewModel @Inject constructor(
                     .set(userInfo)
             }.onSuccess {
                 setLoading(isLoading = false)
-                preference.setSignup()
-                preference.setNickname(nickname = nickname)
+                preference.run {
+                    setSignup()
+                    setUserInfo(userInfo)
+                }
                 setEffect { Effect.SignupSuccess }
             }.onFailure {
                 setLoading(isLoading = false)
@@ -91,10 +94,6 @@ class SignupViewModel @Inject constructor(
 
     private fun setLoading(isLoading: Boolean) {
         _state.value = _state.value.copy(isLoading = isLoading)
-    }
-
-    companion object {
-        const val COLLECTION_USER = "user"
     }
 }
 

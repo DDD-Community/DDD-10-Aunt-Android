@@ -1,18 +1,30 @@
 package com.aunt.opeace.write
 
+import androidx.lifecycle.viewModelScope
+import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_CARD
+import com.aunt.opeace.model.CardItem
+import com.aunt.opeace.preference.OPeacePreference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WriteViewModel @Inject constructor() : BaseViewModel() {
+class WriteViewModel @Inject constructor(
+    private val oPeacePreference: OPeacePreference
+) : BaseViewModel() {
     private val _state: MutableStateFlow<State> = MutableStateFlow(State())
     val state: StateFlow<State> get() = _state
 
     fun handleEvent(event: Event) = when (event) {
-        is Event.SetText -> setText(text = event.text)
+        is Event.SetText -> {
+            _state.value = _state.value.copy(text = event.text)
+        }
         is Event.SetFirstAnswer -> {
             _state.value = _state.value.copy(firstAnswer = event.answer)
         }
@@ -21,20 +33,48 @@ class WriteViewModel @Inject constructor() : BaseViewModel() {
             _state.value = _state.value.copy(secondAnswer = event.answer)
         }
 
-        Event.OnClickButton -> {
-            // save firestore
+        Event.OnClickButton -> uploadCard()
+    }
+
+    private fun uploadCard() {
+        setIsLoading(true)
+        val firstAnswer = _state.value.firstAnswer
+        val secondAnswer = _state.value.secondAnswer
+        val title = _state.value.text
+
+        viewModelScope.launch {
+            runCatching {
+                Firebase.firestore.collection(COLLECTION_CARD)
+                    .add(
+                        CardItem(
+                            nickname = oPeacePreference.getUserInfo().nickname,
+                            age = oPeacePreference.getUserInfo().age,
+                            job = oPeacePreference.getUserInfo().job,
+                            title = title,
+                            firstWord = firstAnswer,
+                            secondWord = secondAnswer
+                        )
+                    )
+            }.onSuccess {
+                setEffect { Effect.UploadSuccess }
+                setIsLoading(false)
+            }.onFailure {
+                setEffect { Effect.UploadFail }
+                setIsLoading(false)
+            }
         }
     }
 
-    private fun setText(text: String) {
-        _state.value = _state.value.copy(text = text)
+    private fun setIsLoading(isLoading: Boolean) {
+        _state.value = _state.value.copy(isLoading = isLoading)
     }
 }
 
 data class State(
     val text: String = "",
     val firstAnswer: String = "",
-    val secondAnswer: String = ""
+    val secondAnswer: String = "",
+    val isLoading: Boolean = false
 )
 
 sealed interface Event {
@@ -42,4 +82,9 @@ sealed interface Event {
     data class SetFirstAnswer(val answer: String) : Event
     data class SetSecondAnswer(val answer: String) : Event
     data object OnClickButton : Event
+}
+
+sealed interface Effect : BaseEffect {
+    data object UploadSuccess : Effect
+    data object UploadFail : Effect
 }

@@ -2,7 +2,10 @@ package com.aunt.opeace.preference
 
 import android.content.Context
 import androidx.core.content.edit
+import com.aunt.opeace.signup.UserInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 interface OPeacePreference {
@@ -10,8 +13,8 @@ interface OPeacePreference {
     fun setTerms()
     fun isLogin(): Boolean
     fun setLogin(isLogin: Boolean)
-    fun setNickname(nickname: String)
-    fun getNickname(): String
+    fun setUserInfo(userInfo: UserInfo)
+    fun getUserInfo(): UserInfo
     fun isSignup() : Boolean
     fun setSignup()
 
@@ -45,14 +48,22 @@ class OPeacePreferenceImpl @Inject constructor(
         }
     }
 
-    override fun setNickname(nickname: String) {
+    override fun setUserInfo(userInfo: UserInfo) {
         preference.edit {
-            putString("key_nickname", nickname)
+            runCatching {
+                val json = Json.encodeToString(userInfo)
+                putString("key_userinfo", json)
+            }.onFailure { UserInfo() }
         }
     }
 
-    override fun getNickname(): String {
-        return preference.getString("key_nickname", "") ?: ""
+    override fun getUserInfo(): UserInfo {
+        val json = preference.getString("key_userinfo", null)
+        return if (json != null) {
+            Json.decodeFromString<UserInfo>(json)
+        } else {
+            UserInfo()
+        }
     }
 
     override fun isSignup(): Boolean {

@@ -2,6 +2,7 @@ package com.aunt.opeace.home
 
 import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_CARD
 import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.model.CardItem
 import com.google.firebase.firestore.ktx.firestore
@@ -66,9 +67,6 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
                     .document(card.id)
                     .update("likeCount", card.likeCount + 1)
             }
-                .onFailure {
-                    println("???????????? error: ${it.message}")
-                }
         }
         updateLikeCount(targetCard = card)
     }
@@ -169,10 +167,6 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
                     .add(it)
             }
         }
-    }
-
-    companion object {
-        const val COLLECTION_CARD = "card"
     }
 }
 

@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +45,13 @@ import com.aunt.opeace.R
 import com.aunt.opeace.block.BlockActivity
 import com.aunt.opeace.common.OPeaceTopBar
 import com.aunt.opeace.login.LoginActivity
-import com.aunt.opeace.login.email.EmailInputActivity
 import com.aunt.opeace.quit.QuitActivity
+import com.aunt.opeace.signup.UserInfo
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_500
+import com.aunt.opeace.ui.theme.WHITE_600
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,6 +79,8 @@ private fun Content(
     var dialogType by remember { mutableStateOf(MyPageDialogType.LOGOUT) }
     var isShowDialog by remember { mutableStateOf(false) }
 
+    val userInfo = viewModel.state.collectAsState().value.userInfo
+
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collectLatest {
             when (it) {
@@ -103,6 +107,7 @@ private fun Content(
 
     Content(
         sheetState = sheetState,
+        userInfo = userInfo,
         showBottomSheet = showBottomSheet,
         isShowDialog = isShowDialog,
         dialogType = dialogType,
@@ -122,6 +127,9 @@ private fun Content(
         },
         onChangeBottomSheetState = {
             showBottomSheet = it
+        },
+        onClickBack = {
+            activity.finish()
         }
     )
 }
@@ -130,23 +138,24 @@ private fun Content(
 @Composable
 private fun Content(
     sheetState: SheetState,
+    userInfo: UserInfo,
     showBottomSheet: Boolean,
     isShowDialog: Boolean,
     dialogType: MyPageDialogType,
     onSentEvent: (Event) -> Unit,
     onClickDialogLeftButton: () -> Unit,
     onClickDialogRightButton: () -> Unit,
-    onChangeBottomSheetState: (Boolean) -> Unit
+    onChangeBottomSheetState: (Boolean) -> Unit,
+    onClickBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
             OPeaceTopBar(
                 title = "마이페이지",
-                onClickLeftImage = {
-
-                }
+                onClickLeftImage = onClickBack
             )
         },
+        containerColor = WHITE_600
     ) { contentPadding ->
         if (showBottomSheet) {
             ModalBottomSheet(
@@ -177,9 +186,9 @@ private fun Content(
 
         Column(modifier = Modifier.padding(contentPadding)) {
             MyInfo(
-                nickname = "엠제이엠제이",
-                job = "경영",
-                age = "세대",
+                nickname = userInfo.nickname,
+                job = userInfo.job,
+                age = userInfo.generation,
                 onClickSetting = {
                     onChangeBottomSheetState(true)
                 }
@@ -214,7 +223,7 @@ private fun MyInfo(
                 bottom = 24.dp,
                 start = 20.dp
             ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = nickname,
@@ -222,7 +231,7 @@ private fun MyInfo(
             fontSize = 28.sp,
             fontWeight = FontWeight.W600
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         TextChip(
             text = job,
             isSelected = false

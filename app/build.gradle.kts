@@ -8,6 +8,9 @@ plugins {
     id("com.google.dagger.hilt.android")
 
     id("com.google.gms.google-services")
+
+    //kotlin("jvm") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -94,6 +97,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.gms.play.services.auth)
 }

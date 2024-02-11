@@ -3,15 +3,14 @@ package com.aunt.opeace.quit
 import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_USER
 import com.aunt.opeace.preference.OPeacePreference
-import com.aunt.opeace.signup.SignupViewModel.Companion.COLLECTION_USER
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -71,7 +70,7 @@ class QuitViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 database.collection(COLLECTION_USER)
-                    .document(oPeacePreference.getNickname())
+                    .document(oPeacePreference.getUserInfo().nickname)
                     .delete()
             }
         }

@@ -17,7 +17,7 @@ class LoginViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        _state.value = _state.value.copy(nickname = oPeacePreference.getNickname())
+        _state.value = _state.value.copy(nickname = oPeacePreference.getUserInfo().nickname)
     }
 
     fun handleEvent(event: Event) = when (event) {

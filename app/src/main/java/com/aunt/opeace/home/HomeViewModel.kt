@@ -39,20 +39,95 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
 
     private fun getCards() {
         viewModelScope.launch {
-            database.collection(COLLECTION_CARD)
-                .get()
-                .addOnSuccessListener {
-                    val list = mutableListOf<CardItem>()
-                    for (result in it) {
-                        val card = result.toObject<CardItem>().copy(id = result.id)
-                        list.add(card)
-                    }
-                    _state.value = _state.value.copy(cards = list)
-                    setIsLoading(false)
-                }
-                .addOnFailureListener {
-                    setIsLoading(false)
-                }
+            val resultCards = getDummyCards().mapIndexed { index, card ->
+                val random = (0..9).random()
+                val firstPercent = firstPercentList[random]
+                val secondPercent = 100 - firstPercent
+                card.copy(
+                    firstPercent = "${firstPercentList[random]}%",
+                    firstResultList = when (random) {
+                        in (3..4) -> {
+                            hashMapOf(
+                                "Z세대" to firstPercent
+                            )
+                        }
+
+                        in (5..6) -> {
+                            hashMapOf(
+                                "Y세대" to firstPercent / 2,
+                                "M세대" to firstPercent / 2
+                            )
+                        }
+
+                        in (7..8) -> {
+                            hashMapOf(
+                                "Y세대" to firstPercent / 3,
+                                "M세대" to firstPercent / 3,
+                                "베이비붐" to firstPercent / 3
+                            )
+                        }
+
+                        else -> {
+                            hashMapOf(
+                                "Y세대" to firstPercent / 4,
+                                "M세대" to firstPercent / 4,
+                                "베이비붐" to firstPercent / 4,
+                                "Z세대" to firstPercent / 4
+                            )
+                        }
+                    },
+                    secondPercent = "${secondPercent}%",
+                    secondResultList = when (random) {
+                        in (3..4) -> {
+                            hashMapOf(
+                                "Y세대" to secondPercent / 4,
+                                "M세대" to secondPercent / 4,
+                                "베이비붐" to secondPercent / 4,
+                                "Z세대" to secondPercent / 4
+                            )
+                        }
+
+                        in (5..6) -> {
+                            hashMapOf(
+                                "Y세대" to secondPercent / 3,
+                                "M세대" to secondPercent / 3,
+                                "Z세대" to secondPercent / 3,
+                            )
+                        }
+
+                        in (7..8) -> {
+                            hashMapOf(
+                                "Y세대" to secondPercent / 2,
+                                "M세대" to secondPercent / 2
+                            )
+                        }
+
+                        else -> {
+                            hashMapOf(
+                                "베이비붐" to secondPercent
+                            )
+                        }
+                    },
+                    respondCount = (0..1000).random(),
+                    likeCount = (0..1000).random()
+                )
+            }
+            _state.value = _state.value.copy(cards = resultCards)
+            setIsLoading(false)
+//            database.collection(COLLECTION_CARD)
+//                .get()
+//                .addOnSuccessListener {
+//                    val list = mutableListOf<CardItem>()
+//                    for (result in it) {
+//                        val card = result.toObject<CardItem>().copy(id = result.id)
+//                        list.add(card)
+//                    }
+//                    _state.value = _state.value.copy(cards = list)
+//                    setIsLoading(false)
+//                }
+//                .addOnFailureListener {
+//                    setIsLoading(false)
+//                }
         }
     }
 

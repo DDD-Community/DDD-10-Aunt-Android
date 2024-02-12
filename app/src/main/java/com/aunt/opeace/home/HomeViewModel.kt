@@ -1,7 +1,9 @@
 package com.aunt.opeace.home
 
 import androidx.lifecycle.viewModelScope
+import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_BLOCK
 import com.aunt.opeace.constants.COLLECTION_CARD
 import com.aunt.opeace.constants.FIELD_AGE
 import com.aunt.opeace.constants.FIELD_CREATED_TIME
@@ -9,6 +11,7 @@ import com.aunt.opeace.constants.FIELD_JOB
 import com.aunt.opeace.constants.FIELD_LIKE_COUNT
 import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.model.CardItem
+import com.aunt.opeace.model.UserInfo
 import com.aunt.opeace.preference.OPeacePreference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
@@ -37,6 +40,11 @@ class HomeViewModel @Inject constructor(
     fun handleEvent(event: Event) = when (event) {
         is Event.OnClickLike -> updateCard(card = event.card)
         is Event.OnClickFilter -> setFilter(filter = event.filter)
+        is Event.OnClickMore -> {
+            _state.value = _state.value.copy(clickedIndex = event.targetIndex)
+        }
+
+        Event.OnClickBlock -> saveBlockCard()
 
         Event.OnClickA -> {
 
@@ -170,6 +178,33 @@ class HomeViewModel @Inject constructor(
         return query
     }
 
+    private fun saveBlockCard() {
+        val targetIndex = state.value.clickedIndex
+        if (targetIndex < 0) {
+            return
+        }
+        val targetUser = state.value.cards.getOrNull(index = targetIndex) ?: return
+
+        viewModelScope.launch {
+            database.collection(COLLECTION_BLOCK)
+                .document(oPeacePreference.getUserInfo().nickname)
+                .collection(oPeacePreference.getUserInfo().nickname)
+                .add(
+                    UserInfo(
+                        nickname = targetUser.nickname,
+                        job = targetUser.job,
+                        age = targetUser.age
+                    )
+                )
+                .addOnSuccessListener {
+                    setEffect { Effect.BlockUserSuccess }
+                }
+                .addOnFailureListener {
+                    setEffect { Effect.BlockUserFail(it.message ?: "차단할 수 없습니다.") }
+                }
+        }
+    }
+
     private fun setDatabase() {
         viewModelScope.launch {
             val cards = getDummyCards()
@@ -260,6 +295,13 @@ sealed interface Event {
     data object OnClickA : Event
     data object OnClickB : Event
     data class OnClickFilter(val filter: Filter) : Event
+    data object OnClickBlock : Event
+    data class OnClickMore(val targetIndex: Int) : Event
+}
+
+sealed interface Effect : BaseEffect {
+    data object BlockUserSuccess : Effect
+    data class BlockUserFail(val message: String) : Effect
 }
 
 data class State(
@@ -268,7 +310,8 @@ data class State(
     val jobText: String = "계열",
     val ageText: String = "세대",
     val recentAndPopularText: String = "정렬",
-    val isLogin: Boolean = false
+    val isLogin: Boolean = false,
+    val clickedIndex: Int = -1
 )
 
 enum class FilterType {
@@ -278,6 +321,16 @@ enum class FilterType {
     NONE;
 
     val isNone get() = this == NONE
+}
+
+enum class BottomSheetType {
+    FILTER,
+    BLOCK,
+    NONE;
+
+    val isNone get() = this == NONE
+    val isFilter get() = this == FILTER
+    val isBlock get() = this == BLOCK
 }
 
 data class Filter(

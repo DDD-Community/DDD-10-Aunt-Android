@@ -1,9 +1,10 @@
-package com.aunt.opeace.signup
+package com.aunt.opeace.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserInfo(
+    val id: String = "",
     val nickname: String = "",
     val job: String = "",
     val age: String = ""

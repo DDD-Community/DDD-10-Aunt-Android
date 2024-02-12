@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.constants.COLLECTION_USER
+import com.aunt.opeace.model.UserInfo
 import com.aunt.opeace.preference.OPeacePreference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject

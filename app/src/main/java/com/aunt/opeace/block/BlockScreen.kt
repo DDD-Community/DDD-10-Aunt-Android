@@ -1,5 +1,6 @@
 package com.aunt.opeace.block
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,17 +17,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aunt.opeace.R
 import com.aunt.opeace.common.OPeaceTopBar
+import com.aunt.opeace.model.UserInfo
 import com.aunt.opeace.ui.theme.Color_303030
 import com.aunt.opeace.ui.theme.Color_7D7D7D
 import com.aunt.opeace.ui.theme.WHITE
@@ -44,16 +49,17 @@ fun BlockScreen() {
 
 @Composable
 private fun Content(viewModel: BlockViewModel) {
+    val blockUsers = viewModel.state.collectAsState().value.blockUsers
 
     Content(
-        blockList = emptyList(),
+        blockUsers = blockUsers,
         onSentEvent = viewModel::handleEvent
     )
 }
 
 @Composable
 private fun Content(
-    blockList: List<String>,
+    blockUsers: List<UserInfo>,
     onSentEvent: (Event) -> Unit
 ) {
     val context = LocalContext.current
@@ -69,30 +75,34 @@ private fun Content(
                 (context as BlockActivity).finish()
             }
         )
-        Text(
-            modifier = Modifier.padding(
-                top = 30.dp,
-                start = 26.dp,
-                bottom = 16.dp
-            ),
-            text = "차단 목록",
-            color = WHITE,
-            fontWeight = FontWeight.W700,
-            fontSize = 18.sp
-        )
-        List(
-            list = blockList,
-            onClickClear = {
-                onSentEvent(Event.OnClickBlockUser(id = "0"))
-            }
-        )
+        if (blockUsers.isEmpty()) {
+            EmptyView(modifier = Modifier.padding(top = 40.dp))
+        } else {
+            Text(
+                modifier = Modifier.padding(
+                    top = 30.dp,
+                    start = 26.dp,
+                    bottom = 16.dp
+                ),
+                text = "차단 목록",
+                color = WHITE,
+                fontWeight = FontWeight.W700,
+                fontSize = 18.sp
+            )
+            List(
+                list = blockUsers,
+                onClickClear = {
+                    onSentEvent(Event.OnClickUnLockUser(userInfo = it))
+                }
+            )
+        }
     }
 }
 
 @Composable
 private fun List(
-    list: List<String>,
-    onClickClear: () -> Unit
+    list: List<UserInfo>,
+    onClickClear: (UserInfo) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -100,12 +110,14 @@ private fun List(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(10) {
+        items(list.size) {
             BlockUser(
-                nickname = "엠제이엠제이",
-                job = "경영",
-                age = "Z세대",
-                onClickClear = onClickClear
+                nickname = list[it].nickname,
+                job = list[it].job,
+                age = list[it].age,
+                onClickClear = {
+                    onClickClear(list[it])
+                }
             )
         }
     }
@@ -187,4 +199,24 @@ private fun BlockText(
         fontWeight = fontWeight,
         color = color
     )
+}
+
+@Composable
+private fun EmptyView(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_login_logo),
+            contentDescription = null
+        )
+        Text(
+            text = "차단한 유저가 없어요",
+            color = WHITE,
+            fontWeight = FontWeight.W700,
+            fontSize = 24.sp
+        )
+    }
 }

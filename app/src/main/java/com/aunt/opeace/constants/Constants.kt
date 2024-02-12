@@ -1,8 +1,5 @@
 package com.aunt.opeace.constants
 
-const val COLLECTION_CARD = "card"
-const val COLLECTION_USER = "user"
-
 val jobList = listOf(
     "경영",
     "광고",

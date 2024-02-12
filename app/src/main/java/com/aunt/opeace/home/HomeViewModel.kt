@@ -3,6 +3,10 @@ package com.aunt.opeace.home
 import androidx.lifecycle.viewModelScope
 import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.constants.COLLECTION_CARD
+import com.aunt.opeace.constants.FIELD_AGE
+import com.aunt.opeace.constants.FIELD_CREATED_TIME
+import com.aunt.opeace.constants.FIELD_JOB
+import com.aunt.opeace.constants.FIELD_LIKE_COUNT
 import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.model.CardItem
 import com.aunt.opeace.preference.OPeacePreference
@@ -116,6 +120,7 @@ class HomeViewModel @Inject constructor(
             FilterType.JOB,
             FilterType.AGE,
             FilterType.RECENT_AND_POPULAR -> requestQuery()
+
             FilterType.NONE -> Unit
         }
     }
@@ -146,21 +151,21 @@ class HomeViewModel @Inject constructor(
         var query: Query = database.collection(COLLECTION_CARD)
 
         age.takeIf { it != "세대" }?.let {
-            query = query.whereEqualTo("age", it)
+            query = query.whereEqualTo(FIELD_AGE, it)
         }
 
         job.takeIf { it != "계열" }?.let {
-            query = query.whereEqualTo("job", it)
+            query = query.whereEqualTo(FIELD_JOB, it)
         }
 
         recentAndPopular.takeIf { it != "정렬" }?.let {
             if (it == "최신순") {
-                // query = query.orderBy(Query.Direction.DESCENDING) 모델에 시간을 저장안했다...
-            } else { // 인기순
-                query = query.orderBy("likeCount", Query.Direction.DESCENDING)
+                query = query.orderBy(FIELD_CREATED_TIME, Query.Direction.DESCENDING)
+            }
+            if (it == "인기순") {
+                query = query.orderBy(FIELD_LIKE_COUNT, Query.Direction.DESCENDING)
             }
         }
-
 
         return query
     }
@@ -238,7 +243,8 @@ class HomeViewModel @Inject constructor(
                         }
                     },
                     respondCount = (0..1000).random(),
-                    likeCount = (0..1000).random()
+                    likeCount = (0..1000).random(),
+                    createdTime = System.currentTimeMillis()
                 )
             }
             resultCards.forEach {

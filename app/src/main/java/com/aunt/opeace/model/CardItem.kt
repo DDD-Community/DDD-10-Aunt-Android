@@ -17,6 +17,7 @@ data class CardItem(
     val secondResultList: HashMap<String, Int> = hashMapOf(),
     val respondCount: Int = 0,
     val likeCount: Int = 0,
+    val createdTime: Long = 0L
 ) {
     val firstResult: List<Pair<String, Int>>
         get() = firstResultList.map {

@@ -188,7 +188,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             database.collection(COLLECTION_BLOCK)
                 .document(oPeacePreference.getUserInfo().nickname)
-                .collection(targetUser.nickname)
+                .collection(oPeacePreference.getUserInfo().nickname)
                 .add(
                     UserInfo(
                         nickname = targetUser.nickname,

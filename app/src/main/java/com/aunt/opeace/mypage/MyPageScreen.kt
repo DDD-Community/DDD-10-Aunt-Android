@@ -43,10 +43,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.block.BlockActivity
+import com.aunt.opeace.common.OPeaceDialog
+import com.aunt.opeace.common.OPeaceDialogType
 import com.aunt.opeace.common.OPeaceTopBar
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.quit.QuitActivity
-import com.aunt.opeace.signup.UserInfo
+import com.aunt.opeace.model.UserInfo
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
@@ -76,7 +78,7 @@ private fun Content(
     sheetState: SheetState
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
-    var dialogType by remember { mutableStateOf(MyPageDialogType.LOGOUT) }
+    var dialogType by remember { mutableStateOf(OPeaceDialogType.LOGOUT) }
     var isShowDialog by remember { mutableStateOf(false) }
 
     val userInfo = viewModel.state.collectAsState().value.userInfo
@@ -93,13 +95,13 @@ private fun Content(
                 Effect.Logout -> {
                     showBottomSheet = false
                     isShowDialog = true
-                    dialogType = MyPageDialogType.LOGOUT
+                    dialogType = OPeaceDialogType.LOGOUT
                 }
 
                 Effect.Quit -> {
                     showBottomSheet = false
                     isShowDialog = true
-                    dialogType = MyPageDialogType.QUIT
+                    dialogType = OPeaceDialogType.QUIT
                 }
             }
         }
@@ -141,7 +143,7 @@ private fun Content(
     userInfo: UserInfo,
     showBottomSheet: Boolean,
     isShowDialog: Boolean,
-    dialogType: MyPageDialogType,
+    dialogType: OPeaceDialogType,
     onSentEvent: (Event) -> Unit,
     onClickDialogLeftButton: () -> Unit,
     onClickDialogRightButton: () -> Unit,
@@ -173,12 +175,12 @@ private fun Content(
         }
 
         if (isShowDialog) {
-            MyPageDialog(
+            OPeaceDialog(
                 dialogType = dialogType,
-                onClickCancel = {
+                onClickLeftButton = {
                     onClickDialogLeftButton()
                 },
-                onClickLogout = {
+                onClickRightButton = {
                     onClickDialogRightButton()
                 }
             )

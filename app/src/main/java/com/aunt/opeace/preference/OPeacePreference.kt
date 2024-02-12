@@ -2,7 +2,7 @@ package com.aunt.opeace.preference
 
 import android.content.Context
 import androidx.core.content.edit
-import com.aunt.opeace.signup.UserInfo
+import com.aunt.opeace.model.UserInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

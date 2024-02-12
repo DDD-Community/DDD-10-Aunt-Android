@@ -1,4 +1,4 @@
-package com.aunt.opeace.mypage
+package com.aunt.opeace.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,16 +27,16 @@ import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_500
 
 @Composable
-fun MyPageDialog(
-    dialogType: MyPageDialogType,
-    onClickCancel: () -> Unit,
-    onClickLogout: () -> Unit
+fun OPeaceDialog(
+    dialogType: OPeaceDialogType,
+    onClickLeftButton: () -> Unit,
+    onClickRightButton: () -> Unit
 ) {
     if (dialogType.isNone) {
         return
     }
 
-    Dialog(onDismissRequest = { onClickCancel() }) {
+    Dialog(onDismissRequest = { onClickLeftButton() }) {
         Surface(
             modifier = Modifier.wrapContentSize(),
             color = Color_303030,
@@ -64,10 +64,10 @@ fun MyPageDialog(
                     Text(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable(onClick = onClickCancel)
+                            .clickable(onClick = onClickLeftButton)
                             .clip(RoundedCornerShape(100.dp))
                             .background(
-                                if (dialogType.isLogout) {
+                                if (dialogType.isLogout || dialogType.isBlock) {
                                     WHITE_500
                                 } else {
                                     LIGHTEN
@@ -87,10 +87,10 @@ fun MyPageDialog(
                     Text(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable(onClick = onClickLogout)
+                            .clickable(onClick = onClickRightButton)
                             .clip(RoundedCornerShape(100.dp))
                             .background(
-                                if (dialogType.isLogout) {
+                                if (dialogType.isLogout || dialogType.isBlock) {
                                     LIGHTEN
                                 } else {
                                     WHITE_500
@@ -113,16 +113,18 @@ fun MyPageDialog(
     }
 }
 
-enum class MyPageDialogType(
+enum class OPeaceDialogType(
     val title: String = "",
     val leftButtonText: String = "",
     val rightButtonText: String = ""
 ) {
     LOGOUT(title = "로그아웃 하시겠어요?", leftButtonText = "아니요", rightButtonText = "로그아웃"),
     QUIT(title = "정말 탈퇴하시겠어요?", leftButtonText = "아니요", rightButtonText = "탈퇴하기"),
+    BLOCK(title = "정말 차단하시겠어요?", leftButtonText = "아니요", rightButtonText = "네"),
     NONE;
 
     val isLogout: Boolean get() = this == LOGOUT
     val isQuit: Boolean get() = this == QUIT
     val isNone: Boolean get() = this == NONE
+    val isBlock: Boolean get() = this == BLOCK
 }

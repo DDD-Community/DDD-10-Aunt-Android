@@ -1,4 +1,4 @@
-package com.aunt.opeace.signup
+package com.aunt.opeace.model
 
 import kotlinx.serialization.Serializable
 

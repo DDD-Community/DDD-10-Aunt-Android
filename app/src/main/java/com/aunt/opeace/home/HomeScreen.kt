@@ -1,6 +1,7 @@
 package com.aunt.opeace.home
 
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,19 +34,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +53,12 @@ import com.aunt.opeace.common.FlipController
 import com.aunt.opeace.common.Flippable
 import com.aunt.opeace.common.OPeaceCard
 import com.aunt.opeace.common.OPeaceSelectedCard
+import com.aunt.opeace.constants.ageList
+import com.aunt.opeace.constants.jobList
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.model.CardItem
 import com.aunt.opeace.mypage.MyPageActivity
+import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.Color_77777
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
@@ -65,6 +67,7 @@ import com.aunt.opeace.ui.theme.WHITE_400
 import com.aunt.opeace.ui.theme.WHITE_500
 import com.aunt.opeace.ui.theme.WHITE_600
 import com.aunt.opeace.write.WriteActivity
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,44 +92,60 @@ private fun Content(
 ) {
     val cards = viewModel.state.collectAsState().value.cards
     val isLoading = viewModel.state.collectAsState().value.isLoading
+    val job = viewModel.state.collectAsState().value.jobText
+    val age = viewModel.state.collectAsState().value.ageText
+    val recentAndPopularText = viewModel.state.collectAsState().value.recentAndPopularText
 
     Content(
         activity = activity,
         isLogin = true,
         isLoading = isLoading,
         cards = cards,
+        job = job,
+        age = age,
+        recentAndPopular = recentAndPopularText,
         sheetState = sheetState,
         onSentEvent = viewModel::handleEvent
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Content(
     activity: HomeActivity,
     isLogin: Boolean,
     isLoading: Boolean,
+    job: String,
+    age: String,
+    recentAndPopular: String,
     cards: List<CardItem>,
     sheetState: SheetState,
     onSentEvent: (Event) -> Unit,
 ) {
-    var filterVisible by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var filter by remember { mutableStateOf(Filter()) }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(WHITE_600)
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize(),
+        containerColor = WHITE_600
     ) {
-        if (filterVisible) {
+        if (showBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = { filterVisible = false },
+                onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState,
+                containerColor = WHITE_500,
                 content = {
-                    Column {
-                        Text(text = "경영")
-                        Text(text = "기획")
-                    }
+                    BottomSheetContent(
+                        filter = filter,
+                        onClick = { filter ->
+                            scope.launch {
+                                showBottomSheet = false
+                                sheetState.hide()
+                            }
+                            onSentEvent(Event.OnClickFilter(filter))
+                        }
+                    )
                 },
             )
         }
@@ -135,14 +154,20 @@ private fun Content(
             modifier = Modifier.padding(it)
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 20.dp)
             ) {
-                item {
+                stickyHeader {
                     Header(
-                        onClickFilter = {
-                            filterVisible = true
+                        job = job,
+                        age = age,
+                        recentAndPopular = recentAndPopular,
+                        onClickFilter = { item ->
+                            filter = item
+                            showBottomSheet = true
                         },
                         onClickProfile = {
                             if (isLogin) {
@@ -213,7 +238,8 @@ private fun Content(
                 text = "글쓰기",
                 fontWeight = FontWeight.W700,
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color_1D1D1D
             )
 
             if (isLoading) {
@@ -231,33 +257,39 @@ private fun Content(
 @Composable
 private fun Header(
     modifier: Modifier = Modifier,
-    job: String = "계열",
-    age: String = "세대",
-    query: String = "최신순",
-    onClickFilter: (String) -> Unit,
+    job: String,
+    age: String,
+    recentAndPopular: String,
+    onClickFilter: (Filter) -> Unit,
     onClickProfile: () -> Unit,
 ) {
     Row(
         modifier = modifier
-            .padding(start = 40.dp, end = 16.dp, top = 22.dp, bottom = 16.dp)
+            .padding(start = 40.dp, top = 22.dp, bottom = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         FilterChip(
             text = job,
-            isSelected = true,
-            onClick = onClickFilter,
+            isSelected = job != "계열",
+            onClick = {
+                onClickFilter(Filter(type = FilterType.JOB, text = it))
+            },
         )
         FilterChip(
             text = age,
-            isSelected = true,
-            onClick = onClickFilter,
+            isSelected = age != "세대",
+            onClick = {
+                onClickFilter(Filter(type = FilterType.AGE, text = it))
+            },
         )
         FilterChip(
-            text = query,
-            isSelected = true,
-            onClick = onClickFilter,
+            text = recentAndPopular,
+            isSelected = recentAndPopular != "정렬",
+            onClick = {
+                onClickFilter(Filter(type = FilterType.RECENT_AND_POPULAR, text = it))
+            },
         )
         Box(
             modifier = Modifier
@@ -292,7 +324,9 @@ private fun FilterChip(
             )
             .clip(RoundedCornerShape(120.dp))
             .background(color = WHITE_500)
-            .clickable { onClick.invoke("") }
+            .clickable {
+                onClick(text)
+            }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -312,6 +346,87 @@ private fun FilterChip(
             contentDescription = "bottom_arrow"
         )
     }
+}
+
+@Composable
+private fun BottomSheetContent(
+    filter: Filter,
+    onClick: (Filter) -> Unit
+) {
+    if (filter.type.isNone) {
+        return
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .padding(start = 32.dp)
+            .fillMaxWidth()
+            .padding(vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        content = {
+            when (filter.type) {
+                FilterType.JOB -> items(jobList.size) {
+                    BottomSheetContentText(
+                        text = jobList[it],
+                        isSelected = jobList[it] == filter.text,
+                        onClick = { text ->
+                            onClick(filter.copy(text = text))
+                        }
+                    )
+                }
+
+                FilterType.AGE -> items(ageList.size) {
+                    BottomSheetContentText(
+                        text = ageList[it],
+                        isSelected = ageList[it] == filter.text,
+                        onClick = { text ->
+                            onClick(filter.copy(text = text))
+                        }
+                    )
+                }
+
+                FilterType.RECENT_AND_POPULAR -> item {
+                    BottomSheetContentText(
+                        text = "최신순",
+                        isSelected = "최신순" == filter.text,
+                        onClick = { text ->
+                            onClick(filter.copy(text = text))
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    BottomSheetContentText(
+                        text = "인기순",
+                        isSelected = "인기순" == filter.text,
+                        onClick = { text ->
+                            onClick(filter.copy(text = text))
+                        }
+                    )
+                }
+
+
+                FilterType.NONE -> Unit
+            }
+        }
+    )
+}
+
+@Composable
+private fun BottomSheetContentText(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: (String) -> Unit
+) {
+    Text(
+        modifier = Modifier.clickable { onClick(text) },
+        fontWeight = FontWeight.W600,
+        color = if (isSelected) {
+            LIGHTEN
+        } else {
+            WHITE
+        },
+        fontSize = 20.sp,
+        text = text
+    )
 }
 
 @Preview(showBackground = true)
@@ -340,7 +455,7 @@ private fun moveToLogin(activity: HomeActivity) {
 @Composable
 private fun HeaderPreview() {
     Surface(color = WHITE_500) {
-        Header(onClickFilter = {}, onClickProfile = {})
+        Header(job = "", age = "", recentAndPopular = "", onClickFilter = {}, onClickProfile = {})
     }
 }
 

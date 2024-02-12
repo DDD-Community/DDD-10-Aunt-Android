@@ -95,10 +95,11 @@ private fun Content(
     val job = viewModel.state.collectAsState().value.jobText
     val age = viewModel.state.collectAsState().value.ageText
     val recentAndPopularText = viewModel.state.collectAsState().value.recentAndPopularText
+    val isLogin = viewModel.state.collectAsState().value.isLogin
 
     Content(
         activity = activity,
-        isLogin = true,
+        isLogin = isLogin,
         isLoading = isLoading,
         cards = cards,
         job = job,
@@ -215,7 +216,8 @@ private fun Content(
                                 likeCount = cards[it].likeCount,
                                 onClickLike = {
                                     onSentEvent(Event.OnClickLike(cards[it]))
-                                }
+                                },
+                                isMore = isLogin-m
                             )
                         },
                         flipController = flipController
@@ -265,10 +267,10 @@ private fun Header(
 ) {
     Row(
         modifier = modifier
-            .padding(start = 40.dp, top = 22.dp, bottom = 16.dp)
+            .padding(start = 40.dp, top = 22.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
     ) {
         FilterChip(
             text = job,

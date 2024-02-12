@@ -5,6 +5,8 @@ import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.constants.COLLECTION_CARD
 import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.model.CardItem
+import com.aunt.opeace.preference.OPeacePreference
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
@@ -15,10 +17,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : BaseViewModel() {
+class HomeViewModel @Inject constructor(
+    private val oPeacePreference: OPeacePreference
+) : BaseViewModel() {
     private val database = Firebase.firestore
 
-    private val _state = MutableStateFlow(State())
+    private val _state = MutableStateFlow(State(isLogin = oPeacePreference.isLogin()))
     val state: StateFlow<State> get() = _state
 
     init {
@@ -107,22 +111,58 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
         getFilterCards(filter = filter)
     }
 
-    // TODO call firestore query
-    // firestore : https://console.firebase.google.com/u/2/project/opeace-5005c/firestore/data/~2Fcard~2F06mymPwmYYPRGY3Zvo8R?hl=ko&view=panel-view&scopeType=collection&scopeName=%2Fcard&query=
-    // query : https://firebase.google.com/docs/firestore/query-data/queries
     private fun getFilterCards(filter: Filter) {
         when (filter.type) {
-            FilterType.JOB -> {
-
-            }
-
-            FilterType.AGE -> {
-
-            }
-
-            FilterType.RECENT_AND_POPULAR,
+            FilterType.JOB,
+            FilterType.AGE,
+            FilterType.RECENT_AND_POPULAR -> requestQuery()
             FilterType.NONE -> Unit
         }
+    }
+
+    private fun requestQuery() {
+        setIsLoading(true)
+        viewModelScope.launch {
+            getQuery().get()
+                .addOnSuccessListener {
+                    val list = mutableListOf<CardItem>()
+                    for (result in it) {
+                        val card = result.toObject<CardItem>().copy(id = result.id)
+                        list.add(card)
+                    }
+                    _state.value = _state.value.copy(cards = list)
+                    setIsLoading(false)
+                }
+                .addOnFailureListener {
+                    setIsLoading(false)
+                }
+        }
+    }
+
+    private fun getQuery(): Query {
+        val age = state.value.ageText
+        val job = state.value.jobText
+        val recentAndPopular = state.value.recentAndPopularText
+        var query: Query = database.collection(COLLECTION_CARD)
+
+        age.takeIf { it != "세대" }?.let {
+            query = query.whereEqualTo("age", it)
+        }
+
+        job.takeIf { it != "계열" }?.let {
+            query = query.whereEqualTo("job", it)
+        }
+
+        recentAndPopular.takeIf { it != "정렬" }?.let {
+            if (it == "최신순") {
+                // query = query.orderBy(Query.Direction.DESCENDING) 모델에 시간을 저장안했다...
+            } else { // 인기순
+                query = query.orderBy("likeCount", Query.Direction.DESCENDING)
+            }
+        }
+
+
+        return query
     }
 
     private fun setDatabase() {
@@ -221,7 +261,8 @@ data class State(
     val cards: List<CardItem> = emptyList(),
     val jobText: String = "계열",
     val ageText: String = "세대",
-    val recentAndPopularText: String = "정렬"
+    val recentAndPopularText: String = "정렬",
+    val isLogin: Boolean = false
 )
 
 enum class FilterType {

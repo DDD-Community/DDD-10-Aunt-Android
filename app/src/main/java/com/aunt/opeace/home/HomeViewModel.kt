@@ -1,10 +1,17 @@
 package com.aunt.opeace.home
 
 import androidx.lifecycle.viewModelScope
+import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
+import com.aunt.opeace.constants.COLLECTION_BLOCK
 import com.aunt.opeace.constants.COLLECTION_CARD
+import com.aunt.opeace.constants.FIELD_AGE
+import com.aunt.opeace.constants.FIELD_CREATED_TIME
+import com.aunt.opeace.constants.FIELD_JOB
+import com.aunt.opeace.constants.FIELD_LIKE_COUNT
 import com.aunt.opeace.constants.firstPercentList
 import com.aunt.opeace.model.CardItem
+import com.aunt.opeace.model.UserInfo
 import com.aunt.opeace.preference.OPeacePreference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
@@ -33,6 +40,11 @@ class HomeViewModel @Inject constructor(
     fun handleEvent(event: Event) = when (event) {
         is Event.OnClickLike -> updateCard(card = event.card)
         is Event.OnClickFilter -> setFilter(filter = event.filter)
+        is Event.OnClickMore -> {
+            _state.value = _state.value.copy(clickedIndex = event.targetIndex)
+        }
+
+        Event.OnClickBlock -> saveBlockCard()
 
         Event.OnClickA -> {
 
@@ -116,6 +128,7 @@ class HomeViewModel @Inject constructor(
             FilterType.JOB,
             FilterType.AGE,
             FilterType.RECENT_AND_POPULAR -> requestQuery()
+
             FilterType.NONE -> Unit
         }
     }
@@ -146,23 +159,50 @@ class HomeViewModel @Inject constructor(
         var query: Query = database.collection(COLLECTION_CARD)
 
         age.takeIf { it != "세대" }?.let {
-            query = query.whereEqualTo("age", it)
+            query = query.whereEqualTo(FIELD_AGE, it)
         }
 
         job.takeIf { it != "계열" }?.let {
-            query = query.whereEqualTo("job", it)
+            query = query.whereEqualTo(FIELD_JOB, it)
         }
 
         recentAndPopular.takeIf { it != "정렬" }?.let {
             if (it == "최신순") {
-                // query = query.orderBy(Query.Direction.DESCENDING) 모델에 시간을 저장안했다...
-            } else { // 인기순
-                query = query.orderBy("likeCount", Query.Direction.DESCENDING)
+                query = query.orderBy(FIELD_CREATED_TIME, Query.Direction.DESCENDING)
+            }
+            if (it == "인기순") {
+                query = query.orderBy(FIELD_LIKE_COUNT, Query.Direction.DESCENDING)
             }
         }
 
-
         return query
+    }
+
+    private fun saveBlockCard() {
+        val targetIndex = state.value.clickedIndex
+        if (targetIndex < 0) {
+            return
+        }
+        val targetUser = state.value.cards.getOrNull(index = targetIndex) ?: return
+
+        viewModelScope.launch {
+            database.collection(COLLECTION_BLOCK)
+                .document(oPeacePreference.getUserInfo().nickname)
+                .collection(oPeacePreference.getUserInfo().nickname)
+                .add(
+                    UserInfo(
+                        nickname = targetUser.nickname,
+                        job = targetUser.job,
+                        age = targetUser.age
+                    )
+                )
+                .addOnSuccessListener {
+                    setEffect { Effect.BlockUserSuccess }
+                }
+                .addOnFailureListener {
+                    setEffect { Effect.BlockUserFail(it.message ?: "차단할 수 없습니다.") }
+                }
+        }
     }
 
     private fun setDatabase() {
@@ -238,7 +278,8 @@ class HomeViewModel @Inject constructor(
                         }
                     },
                     respondCount = (0..1000).random(),
-                    likeCount = (0..1000).random()
+                    likeCount = (0..1000).random(),
+                    createdTime = System.currentTimeMillis()
                 )
             }
             resultCards.forEach {
@@ -254,6 +295,13 @@ sealed interface Event {
     data object OnClickA : Event
     data object OnClickB : Event
     data class OnClickFilter(val filter: Filter) : Event
+    data object OnClickBlock : Event
+    data class OnClickMore(val targetIndex: Int) : Event
+}
+
+sealed interface Effect : BaseEffect {
+    data object BlockUserSuccess : Effect
+    data class BlockUserFail(val message: String) : Effect
 }
 
 data class State(
@@ -262,7 +310,8 @@ data class State(
     val jobText: String = "계열",
     val ageText: String = "세대",
     val recentAndPopularText: String = "정렬",
-    val isLogin: Boolean = false
+    val isLogin: Boolean = false,
+    val clickedIndex: Int = -1
 )
 
 enum class FilterType {
@@ -272,6 +321,16 @@ enum class FilterType {
     NONE;
 
     val isNone get() = this == NONE
+}
+
+enum class BottomSheetType {
+    FILTER,
+    BLOCK,
+    NONE;
+
+    val isNone get() = this == NONE
+    val isFilter get() = this == FILTER
+    val isBlock get() = this == BLOCK
 }
 
 data class Filter(

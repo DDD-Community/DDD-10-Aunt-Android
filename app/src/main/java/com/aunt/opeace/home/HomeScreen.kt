@@ -1,6 +1,7 @@
 package com.aunt.opeace.home
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +54,8 @@ import com.aunt.opeace.R
 import com.aunt.opeace.common.FlipController
 import com.aunt.opeace.common.Flippable
 import com.aunt.opeace.common.OPeaceCard
+import com.aunt.opeace.common.OPeaceDialog
+import com.aunt.opeace.common.OPeaceDialogType
 import com.aunt.opeace.common.OPeaceSelectedCard
 import com.aunt.opeace.constants.ageList
 import com.aunt.opeace.constants.jobList
@@ -75,6 +79,20 @@ fun HomeScreen() {
     val viewModel: HomeViewModel = viewModel()
     val activity = LocalContext.current as HomeActivity
     val sheetState = rememberModalBottomSheetState()
+
+    LaunchedEffect(key1 = viewModel.effect) {
+        viewModel.effect.collect {
+            when (it) {
+                Effect.BlockUserSuccess -> {
+                    showMessage(activity = activity, message = "차단에 성공했습니다.")
+                }
+
+                is Effect.BlockUserFail -> {
+                    showMessage(activity = activity, message = it.message)
+                }
+            }
+        }
+    }
 
     Content(
         viewModel = viewModel,
@@ -126,6 +144,8 @@ private fun Content(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     var filter by remember { mutableStateOf(Filter()) }
+    var bottomSheetType by remember { mutableStateOf(BottomSheetType.NONE) }
+    var isShowDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -137,17 +157,46 @@ private fun Content(
                 sheetState = sheetState,
                 containerColor = WHITE_500,
                 content = {
-                    BottomSheetContent(
-                        filter = filter,
-                        onClick = { filter ->
+                    if (bottomSheetType.isNone) {
+                        return@ModalBottomSheet
+                    }
+
+                    if (bottomSheetType.isFilter) {
+                        BottomSheetFilterContent(
+                            filter = filter,
+                            onClick = { filter ->
+                                scope.launch {
+                                    showBottomSheet = false
+                                    sheetState.hide()
+                                }
+                                onSentEvent(Event.OnClickFilter(filter))
+                            }
+                        )
+                    }
+
+                    if (bottomSheetType.isBlock) {
+                        BottomSheetBlockContent {
                             scope.launch {
                                 showBottomSheet = false
                                 sheetState.hide()
                             }
-                            onSentEvent(Event.OnClickFilter(filter))
+                            isShowDialog = true
                         }
-                    )
+                    }
                 },
+            )
+        }
+
+        if (isShowDialog) {
+            OPeaceDialog(
+                dialogType = OPeaceDialogType.BLOCK,
+                onClickLeftButton = {
+                    isShowDialog = false
+                },
+                onClickRightButton = {
+                    isShowDialog = false
+                    onSentEvent(Event.OnClickBlock)
+                }
             )
         }
 
@@ -167,6 +216,7 @@ private fun Content(
                         age = age,
                         recentAndPopular = recentAndPopular,
                         onClickFilter = { item ->
+                            bottomSheetType = BottomSheetType.FILTER
                             filter = item
                             showBottomSheet = true
                         },
@@ -179,10 +229,16 @@ private fun Content(
                             }
                         })
                 }
+
+                // TODO 구현 필요
+                // 로그인이 안되어 있을 때 A,B 클릭 못하게 해야함
                 items(cards.size) {
                     val flipController = remember(key1 = it) { FlipController() }
                     Flippable(
                         frontSide = {
+                            // TODO 구현 필요
+                            // onClickFirstButton, onClickSecondButton 클릭 시
+                            // 응답 값 + 1, 결과값 만들어야하는데 여기 계산해야함....
                             OPeaceCard(
                                 nickname = cards[it].nickname,
                                 job = cards[it].job,
@@ -193,8 +249,14 @@ private fun Content(
                                 firstNumber = cards[it].firstNumber,
                                 secondWord = cards[it].secondWord,
                                 secondNumber = cards[it].secondNumber,
+                                isMore = isLogin,
                                 onClickFirstButton = { flipController.flip() },
-                                onClickSecondButton = { flipController.flip() }
+                                onClickSecondButton = { flipController.flip() },
+                                onClickMore = {
+                                    bottomSheetType = BottomSheetType.BLOCK
+                                    showBottomSheet = true
+                                    onSentEvent(Event.OnClickMore(it))
+                                }
                             )
                         },
                         backSide = {
@@ -217,7 +279,12 @@ private fun Content(
                                 onClickLike = {
                                     onSentEvent(Event.OnClickLike(cards[it]))
                                 },
-                                isMore = isLogin
+                                isMore = isLogin,
+                                onClickMore = {
+                                    bottomSheetType = BottomSheetType.BLOCK
+                                    showBottomSheet = true
+                                    onSentEvent(Event.OnClickMore(it))
+                                }
                             )
                         },
                         flipController = flipController
@@ -351,7 +418,7 @@ private fun FilterChip(
 }
 
 @Composable
-private fun BottomSheetContent(
+private fun BottomSheetFilterContent(
     filter: Filter,
     onClick: (Filter) -> Unit
 ) {
@@ -413,6 +480,23 @@ private fun BottomSheetContent(
 }
 
 @Composable
+private fun BottomSheetBlockContent(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(start = 32.dp, bottom = 20.dp)
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+    ) {
+        BottomSheetContentText(
+            text = "신고하기",
+            onClick = {
+                onClick()
+            }
+        )
+    }
+}
+
+@Composable
 private fun BottomSheetContentText(
     text: String,
     isSelected: Boolean = false,
@@ -451,6 +535,10 @@ private fun moveToMyPage(activity: HomeActivity) {
 
 private fun moveToLogin(activity: HomeActivity) {
     activity.startActivity(Intent(activity, LoginActivity::class.java))
+}
+
+private fun showMessage(activity: HomeActivity, message: String) {
+    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
 }
 
 @Preview

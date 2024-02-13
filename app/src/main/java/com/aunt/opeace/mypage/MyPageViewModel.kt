@@ -3,7 +3,7 @@ package com.aunt.opeace.mypage
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.preference.OPeacePreference
-import com.aunt.opeace.signup.UserInfo
+import com.aunt.opeace.model.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

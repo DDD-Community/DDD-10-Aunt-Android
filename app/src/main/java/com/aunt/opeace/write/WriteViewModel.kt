@@ -23,7 +23,11 @@ class WriteViewModel @Inject constructor(
 
     fun handleEvent(event: Event) = when (event) {
         is Event.SetText -> {
-            _state.value = _state.value.copy(text = event.text)
+            if (event.text.length > 60) {
+                setEffect { Effect.InvalidInput("60자까지 작성할 수 있어요") }
+            } else {
+                _state.value = _state.value.copy(text = event.text)
+            }
         }
         is Event.SetFirstAnswer -> {
             _state.value = _state.value.copy(firstAnswer = event.answer)
@@ -87,4 +91,5 @@ sealed interface Event {
 sealed interface Effect : BaseEffect {
     data object UploadSuccess : Effect
     data object UploadFail : Effect
+    data class InvalidInput(val message: String) : Effect
 }

@@ -217,7 +217,7 @@ private fun Content(
                                 onClickLike = {
                                     onSentEvent(Event.OnClickLike(cards[it]))
                                 },
-                                isMore = isLogin-m
+                                isMore = isLogin
                             )
                         },
                         flipController = flipController

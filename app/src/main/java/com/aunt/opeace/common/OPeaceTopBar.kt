@@ -10,18 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aunt.opeace.R
+import com.aunt.opeace.ui.theme.WHITE_200
 
 @Composable
 fun OPeaceTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
-    @DrawableRes leftImageResId: Int = R.drawable.ic_24_previous,
+    @DrawableRes leftImageResId: Int = R.drawable.ic_back,
     onClickLeftImage: () -> Unit
 ) {
     Box(
@@ -40,8 +40,8 @@ fun OPeaceTopBar(
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = title,
-                fontSize = 16.sp,
-                color = Color(0xffC9C9C9),
+                fontSize = 20.sp,
+                color = WHITE_200,
                 fontWeight = FontWeight.W600
             )
         }

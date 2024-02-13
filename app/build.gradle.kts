@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.credentials)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.emoji.picker)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.core.animation.doOnEnd
 import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.login.LoginActivity
+import com.aunt.opeace.login.email.EmailInputActivity
 import com.aunt.opeace.preference.OPeacePreference
 import com.aunt.opeace.signup.SignupActivity
 import com.aunt.opeace.terms.TermsActivity
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
     private fun showSignupScreen() {
         setContent {
             OPeaceTheme {
+                //startActivity(Intent(this, EmailInputActivity::class.java))
                 when {
                     opeacePreference.isTerms().not() -> {
                         startActivity(Intent(this, TermsActivity::class.java))

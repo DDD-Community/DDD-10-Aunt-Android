@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<State> get() = _state
 
     init {
-        getCards()
+        getBlockCards()
         //setDatabase()
     }
 
@@ -55,8 +55,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getCards() {
+    private fun getBlockCards() {
         setIsLoading(true)
+        viewModelScope.launch {
+            database.collection(COLLECTION_BLOCK)
+                .document(oPeacePreference.getUserInfo().nickname)
+                .collection(oPeacePreference.getUserInfo().nickname)
+                .get()
+                .addOnSuccessListener {
+                    val list = mutableListOf<UserInfo>()
+                    for (result in it) {
+                        val userInfo = result.toObject<UserInfo>().copy(id = result.id)
+                        list.add(userInfo)
+                    }
+                    _state.value = _state.value.copy(blockUsers = list)
+                    getCards()
+                }
+                .addOnFailureListener {
+                    setIsLoading(false)
+                }
+        }
+    }
+
+    private fun getCards() {
         viewModelScope.launch {
             database.collection(COLLECTION_CARD)
                 .get()
@@ -66,7 +87,12 @@ class HomeViewModel @Inject constructor(
                         val card = result.toObject<CardItem>().copy(id = result.id)
                         list.add(card)
                     }
-                    _state.value = _state.value.copy(cards = list)
+                    val cards = list.filter { card ->
+                        state.value.blockUsers.none { blockUserInfo ->
+                            card.nickname == blockUserInfo.nickname
+                        }
+                    }
+                    _state.value = _state.value.copy(cards = cards)
                     setIsLoading(false)
                 }
                 .addOnFailureListener {
@@ -183,7 +209,8 @@ class HomeViewModel @Inject constructor(
         if (targetIndex < 0) {
             return
         }
-        val targetUser = state.value.cards.getOrNull(index = targetIndex) ?: return
+        val targetCard = state.value.cards.getOrNull(index = targetIndex) ?: return
+        deleteCard(card = targetCard)
 
         viewModelScope.launch {
             database.collection(COLLECTION_BLOCK)
@@ -191,9 +218,9 @@ class HomeViewModel @Inject constructor(
                 .collection(oPeacePreference.getUserInfo().nickname)
                 .add(
                     UserInfo(
-                        nickname = targetUser.nickname,
-                        job = targetUser.job,
-                        age = targetUser.age
+                        nickname = targetCard.nickname,
+                        job = targetCard.job,
+                        age = targetCard.age
                     )
                 )
                 .addOnSuccessListener {
@@ -203,6 +230,13 @@ class HomeViewModel @Inject constructor(
                     setEffect { Effect.BlockUserFail(it.message ?: "차단할 수 없습니다.") }
                 }
         }
+    }
+
+    private fun deleteCard(card: CardItem) {
+        val newCards = _state.value.copy().cards.toMutableList().filter {
+            it != card
+        }
+        _state.value = _state.value.copy(cards = newCards)
     }
 
     private fun setDatabase() {
@@ -307,6 +341,7 @@ sealed interface Effect : BaseEffect {
 data class State(
     val isLoading: Boolean = true,
     val cards: List<CardItem> = emptyList(),
+    val blockUsers: List<UserInfo> = emptyList(),
     val jobText: String = "계열",
     val ageText: String = "세대",
     val recentAndPopularText: String = "정렬",

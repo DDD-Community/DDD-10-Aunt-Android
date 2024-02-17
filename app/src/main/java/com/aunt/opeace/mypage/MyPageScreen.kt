@@ -5,16 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -45,10 +42,12 @@ import com.aunt.opeace.R
 import com.aunt.opeace.block.BlockActivity
 import com.aunt.opeace.common.OPeaceDialog
 import com.aunt.opeace.common.OPeaceDialogType
+import com.aunt.opeace.common.OPeaceSelectedCard
 import com.aunt.opeace.common.OPeaceTopBar
 import com.aunt.opeace.login.LoginActivity
-import com.aunt.opeace.quit.QuitActivity
+import com.aunt.opeace.model.CardItem
 import com.aunt.opeace.model.UserInfo
+import com.aunt.opeace.quit.QuitActivity
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
@@ -82,6 +81,7 @@ private fun Content(
     var isShowDialog by remember { mutableStateOf(false) }
 
     val userInfo = viewModel.state.collectAsState().value.userInfo
+    val cards = viewModel.state.collectAsState().value.cards
 
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collectLatest {
@@ -110,6 +110,7 @@ private fun Content(
     Content(
         sheetState = sheetState,
         userInfo = userInfo,
+        cards = cards,
         showBottomSheet = showBottomSheet,
         isShowDialog = isShowDialog,
         dialogType = dialogType,
@@ -126,12 +127,21 @@ private fun Content(
             if (dialogType.isLogout) {
                 moveToLogin(activity = activity)
             }
+
+            if (dialogType.isDelete) {
+                viewModel.handleEvent(Event.OnClickDeleteCard)
+            }
         },
         onChangeBottomSheetState = {
             showBottomSheet = it
         },
         onClickBack = {
             activity.finish()
+        },
+        onClickDelete = {
+            isShowDialog = true
+            dialogType = OPeaceDialogType.DELETE
+            viewModel.handleEvent(Event.OnClickCard(it))
         }
     )
 }
@@ -141,6 +151,7 @@ private fun Content(
 private fun Content(
     sheetState: SheetState,
     userInfo: UserInfo,
+    cards: List<CardItem>,
     showBottomSheet: Boolean,
     isShowDialog: Boolean,
     dialogType: OPeaceDialogType,
@@ -148,7 +159,8 @@ private fun Content(
     onClickDialogLeftButton: () -> Unit,
     onClickDialogRightButton: () -> Unit,
     onChangeBottomSheetState: (Boolean) -> Unit,
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    onClickDelete: (CardItem) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -186,27 +198,66 @@ private fun Content(
             )
         }
 
-        Column(modifier = Modifier.padding(contentPadding)) {
-            MyInfo(
-                nickname = userInfo.nickname,
-                job = userInfo.job,
-                age = userInfo.generation,
-                onClickSetting = {
-                    onChangeBottomSheetState(true)
+        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+            item {
+                MyInfo(
+                    nickname = userInfo.nickname,
+                    job = userInfo.job,
+                    age = userInfo.generation,
+                    onClickSetting = {
+                        onChangeBottomSheetState(true)
+                    }
+                )
+                Divider(
+                    modifier = Modifier.background(Color(0xff303030)),
+                    thickness = 8.dp
+                )
+            }
+            item {
+                Text(
+                    modifier = Modifier.padding(start = 20.dp, top = 30.dp, bottom = 12.dp),
+                    text = "내가 올린 글",
+                    color = WHITE,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 18.sp
+                )
+            }
+            if (cards.isEmpty()) {
+                item {
+                    Text(
+                        modifier = Modifier.padding(top = 40.dp).fillMaxWidth(),
+                        fontSize = 20.sp,
+                        text = "작성한 고민이 없어요",
+                        textAlign = TextAlign.Center
+                    )
                 }
-            )
-            Divider(
-                modifier = Modifier.background(Color(0xff303030)),
-                thickness = 8.dp
-            )
-            Text(
-                modifier = Modifier.padding(start = 20.dp, top = 30.dp, bottom = 12.dp),
-                text = "내가 올린 글",
-                color = WHITE,
-                fontWeight = FontWeight.W600,
-                fontSize = 18.sp
-            )
-            MyContent()
+            } else {
+                items(cards.size) {
+                    OPeaceSelectedCard(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 20.dp),
+                        nickname = cards[it].nickname,
+                        job = cards[it].job,
+                        age = cards[it].age,
+                        image = "",
+                        title = cards[it].title,
+                        firstWord = cards[it].firstWord,
+                        firstNumber = cards[it].firstNumber,
+                        firstPercent = cards[it].firstPercent,
+                        secondWord = cards[it].secondWord,
+                        secondNumber = cards[it].secondNumber,
+                        secondPercent = cards[it].secondPercent,
+                        firstResultList = cards[it].firstResult,
+                        secondResultList = cards[it].secondResult,
+                        respondCount = cards[it].respondCount,
+                        likeCount = cards[it].likeCount,
+                        onClickDelete = {
+                            onClickDelete(cards[it])
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -280,25 +331,6 @@ private fun TextChip(
         ),
         textAlign = TextAlign.Center
     )
-}
-
-@Composable
-private fun MyContent() {
-    LazyColumn(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(10) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .background(Color.Blue)
-            ) {
-                Text(text = "카드가 들어갑니다.")
-            }
-        }
-    }
 }
 
 @Composable

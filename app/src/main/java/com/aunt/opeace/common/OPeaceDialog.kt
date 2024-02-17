@@ -67,7 +67,7 @@ fun OPeaceDialog(
                             .clickable(onClick = onClickLeftButton)
                             .clip(RoundedCornerShape(100.dp))
                             .background(
-                                if (dialogType.isLogout || dialogType.isBlock) {
+                                if (dialogType.isLogout || dialogType.isBlock || dialogType.isDelete) {
                                     WHITE_500
                                 } else {
                                     LIGHTEN
@@ -90,7 +90,7 @@ fun OPeaceDialog(
                             .clickable(onClick = onClickRightButton)
                             .clip(RoundedCornerShape(100.dp))
                             .background(
-                                if (dialogType.isLogout || dialogType.isBlock) {
+                                if (dialogType.isLogout || dialogType.isBlock || dialogType.isDelete) {
                                     LIGHTEN
                                 } else {
                                     WHITE_500
@@ -115,16 +115,18 @@ fun OPeaceDialog(
 
 enum class OPeaceDialogType(
     val title: String = "",
-    val leftButtonText: String = "",
-    val rightButtonText: String = ""
+    val leftButtonText: String = "아니요",
+    val rightButtonText: String = "네"
 ) {
     LOGOUT(title = "로그아웃 하시겠어요?", leftButtonText = "아니요", rightButtonText = "로그아웃"),
-    QUIT(title = "정말 탈퇴하시겠어요?", leftButtonText = "아니요", rightButtonText = "탈퇴하기"),
-    BLOCK(title = "정말 차단하시겠어요?", leftButtonText = "아니요", rightButtonText = "네"),
+    QUIT(title = "정말 탈퇴하시겠어요?", rightButtonText = "탈퇴하기"),
+    BLOCK(title = "정말 차단하시겠어요?"),
+    DELETE(title = "고민을 삭제하시겠어요?"),
     NONE;
 
     val isLogout: Boolean get() = this == LOGOUT
     val isQuit: Boolean get() = this == QUIT
     val isNone: Boolean get() = this == NONE
     val isBlock: Boolean get() = this == BLOCK
+    val isDelete: Boolean get() = this == DELETE
 }

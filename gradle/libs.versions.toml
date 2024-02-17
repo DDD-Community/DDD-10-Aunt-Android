@@ -18,9 +18,9 @@ splash-screen = "1.0.0-alpha02"
 lifecycle-viewmodel-compose = "2.7.0"
 gms-play-services-auth = "20.7.0"
 credentials = "1.2.0"
-kakao-login = "2.19.0"
 appcompat = "1.6.1"
 emoji-picker = "1.0.0-alpha01"
+kakao-sdk = "2.19.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -40,6 +40,8 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 gms-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gms-play-services-auth" }
 #splash-screen = { group = "androidx.core:core-splashscreen", version.ref = "splash-screen" }
+kakao-sdk-all = { group = "com.kakao.sdk", name = "v2-all", version.ref = "kakao-sdk" }
+kakao-sdk-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-sdk" }
 
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

@@ -103,4 +103,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.gms.play.services.auth)
+
+    implementation(libs.kakao.sdk.all)
+    implementation(libs.kakao.sdk.user)
 }

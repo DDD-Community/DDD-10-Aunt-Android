@@ -40,8 +40,10 @@ import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.ui.theme.BLACK
 import com.aunt.opeace.ui.theme.Color_1D1D1D
 import com.aunt.opeace.ui.theme.Color_9D9D9D
+import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_300
+import com.aunt.opeace.ui.theme.WHITE_600
 
 @Composable
 fun TermsScreen() {
@@ -80,7 +82,7 @@ private fun Content(viewModel: TermsViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(WHITE)
+            .background(WHITE_600)
     ) {
         Title()
         Description(
@@ -143,7 +145,7 @@ private fun Title() {
     ) {
         Text(
             text = "이용 약관 동의",
-            color = Color_1D1D1D,
+            color = WHITE,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
@@ -185,7 +187,7 @@ private fun Description(
                     text = "약관 전체 동의",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = WHITE_300
+                    color = WHITE
                 )
             }
         )
@@ -200,7 +202,7 @@ private fun Description(
                 Text(
                     text = "(필수) 만 14세 이상입니다.",
                     fontSize = 16.sp,
-                    color = Color_1D1D1D
+                    color = WHITE
                 )
             }
         )
@@ -219,7 +221,7 @@ private fun Description(
                         )
                     },
                     fontSize = 16.sp,
-                    color = Color_1D1D1D
+                    color = WHITE
                 )
             }
         )
@@ -238,7 +240,7 @@ private fun Description(
                         )
                     },
                     fontSize = 16.sp,
-                    color = Color_1D1D1D
+                    color = WHITE
                 )
             }
         )
@@ -271,9 +273,9 @@ private fun Chip(
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 color = if (isSelected) {
-                    BLACK
+                    LIGHTEN
                 } else {
-                    Color_9D9D9D
+                    WHITE_300
                 }
             )
         }

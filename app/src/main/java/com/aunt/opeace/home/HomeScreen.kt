@@ -201,7 +201,9 @@ private fun Content(
         }
 
         Box(
-            modifier = Modifier.padding(it)
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
         ) {
             LazyColumn(
                 modifier = Modifier

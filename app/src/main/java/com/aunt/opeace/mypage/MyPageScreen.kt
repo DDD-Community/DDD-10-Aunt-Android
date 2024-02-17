@@ -176,7 +176,8 @@ private fun Content(
                 onDismissRequest = {
                     onChangeBottomSheetState(false)
                 },
-                sheetState = sheetState
+                sheetState = sheetState,
+                containerColor = WHITE_500
             ) {
                 SheetContent(
                     onClick = { type ->

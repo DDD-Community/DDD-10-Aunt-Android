@@ -29,7 +29,6 @@
         </activity>
         <activity
             android:name=".login.LoginActivity"
-
             android:exported="true" />
         <activity
             android:name=".mypage.MyPageActivity"
@@ -50,6 +49,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".signup.SignupActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".splash.SplashActivity"
             android:exported="true" />
         <activity
             android:name=".terms.TermsActivity"

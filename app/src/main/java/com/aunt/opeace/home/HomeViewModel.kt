@@ -80,6 +80,7 @@ class HomeViewModel @Inject constructor(
     private fun getCards() {
         viewModelScope.launch {
             database.collection(COLLECTION_CARD)
+                .orderBy(FIELD_CREATED_TIME, Query.Direction.ASCENDING)
                 .get()
                 .addOnSuccessListener {
                     val list = mutableListOf<CardItem>()
@@ -194,7 +195,7 @@ class HomeViewModel @Inject constructor(
 
         recentAndPopular.takeIf { it != "정렬" }?.let {
             if (it == "최신순") {
-                query = query.orderBy(FIELD_CREATED_TIME, Query.Direction.DESCENDING)
+                query = query.orderBy(FIELD_CREATED_TIME, Query.Direction.ASCENDING)
             }
             if (it == "인기순") {
                 query = query.orderBy(FIELD_LIKE_COUNT, Query.Direction.DESCENDING)

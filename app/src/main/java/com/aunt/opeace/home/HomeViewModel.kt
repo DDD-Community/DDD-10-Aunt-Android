@@ -58,47 +58,54 @@ class HomeViewModel @Inject constructor(
     private fun getBlockCards() {
         setIsLoading(true)
         viewModelScope.launch {
-            database.collection(COLLECTION_BLOCK)
-                .document(oPeacePreference.getUserInfo().nickname)
-                .collection(oPeacePreference.getUserInfo().nickname)
-                .get()
-                .addOnSuccessListener {
-                    val list = mutableListOf<UserInfo>()
-                    for (result in it) {
-                        val userInfo = result.toObject<UserInfo>().copy(id = result.id)
-                        list.add(userInfo)
+            runCatching {
+                database.collection(COLLECTION_BLOCK)
+                    .document(oPeacePreference.getUserInfo().nickname)
+                    .collection(oPeacePreference.getUserInfo().nickname)
+                    .get()
+                    .addOnSuccessListener {
+                        val list = mutableListOf<UserInfo>()
+                        for (result in it) {
+                            val userInfo = result.toObject<UserInfo>().copy(id = result.id)
+                            list.add(userInfo)
+                        }
+                        _state.value = _state.value.copy(blockUsers = list)
+                        getCards()
                     }
-                    _state.value = _state.value.copy(blockUsers = list)
-                    getCards()
-                }
-                .addOnFailureListener {
-                    setIsLoading(false)
-                }
+                    .addOnFailureListener {
+                        setIsLoading(false)
+                        getCards()
+                    }
+            }.onFailure {
+                getCards()
+            }
         }
     }
 
     private fun getCards() {
         viewModelScope.launch {
-            database.collection(COLLECTION_CARD)
-                .orderBy(FIELD_CREATED_TIME, Query.Direction.ASCENDING)
-                .get()
-                .addOnSuccessListener {
-                    val list = mutableListOf<CardItem>()
-                    for (result in it) {
-                        val card = result.toObject<CardItem>().copy(id = result.id)
-                        list.add(card)
-                    }
-                    val cards = list.filter { card ->
-                        state.value.blockUsers.none { blockUserInfo ->
-                            card.nickname == blockUserInfo.nickname
+            runCatching {
+                database.collection(COLLECTION_CARD)
+                    .orderBy(FIELD_CREATED_TIME, Query.Direction.ASCENDING)
+                    .get()
+                    .addOnSuccessListener {
+                        val list = mutableListOf<CardItem>()
+                        for (result in it) {
+                            val card = result.toObject<CardItem>().copy(id = result.id)
+                            list.add(card)
                         }
+                        val cards = list.filter { card ->
+                            state.value.blockUsers.none { blockUserInfo ->
+                                card.nickname == blockUserInfo.nickname
+                            }
+                        }
+                        _state.value = _state.value.copy(cards = cards)
+                        setIsLoading(false)
                     }
-                    _state.value = _state.value.copy(cards = cards)
-                    setIsLoading(false)
-                }
-                .addOnFailureListener {
-                    setIsLoading(false)
-                }
+                    .addOnFailureListener {
+                        setIsLoading(false)
+                    }
+            }
         }
     }
 

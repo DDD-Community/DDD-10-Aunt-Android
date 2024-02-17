@@ -142,6 +142,7 @@ private fun Content(
     onSentEvent: (Event) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var filter by remember { mutableStateOf(Filter()) }
     var bottomSheetType by remember { mutableStateOf(BottomSheetType.NONE) }
@@ -209,7 +210,7 @@ private fun Content(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                //verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 20.dp)
             ) {
                 stickyHeader {
@@ -232,8 +233,6 @@ private fun Content(
                         })
                 }
 
-                // TODO 구현 필요
-                // 로그인이 안되어 있을 때 A,B 클릭 못하게 해야함
                 items(cards.size) {
                     val flipController = remember(key1 = it) { FlipController() }
                     Flippable(
@@ -252,8 +251,14 @@ private fun Content(
                                 secondWord = cards[it].secondWord,
                                 secondNumber = cards[it].secondNumber,
                                 isMore = isLogin,
-                                onClickFirstButton = { flipController.flip() },
-                                onClickSecondButton = { flipController.flip() },
+                                onClickFirstButton = {
+                                    flipController.flip()
+                                    Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
+                                },
+                                onClickSecondButton = {
+                                    flipController.flip()
+                                    Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
+                                },
                                 onClickMore = {
                                     bottomSheetType = BottomSheetType.BLOCK
                                     showBottomSheet = true
@@ -279,7 +284,9 @@ private fun Content(
                                 respondCount = cards[it].respondCount,
                                 likeCount = cards[it].likeCount,
                                 onClickLike = {
-                                    onSentEvent(Event.OnClickLike(cards[it]))
+                                    if (isLogin) {
+                                        onSentEvent(Event.OnClickLike(cards[it]))
+                                    }
                                 },
                                 isMore = isLogin,
                                 onClickMore = {

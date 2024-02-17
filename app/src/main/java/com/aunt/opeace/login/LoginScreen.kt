@@ -1,6 +1,7 @@
 package com.aunt.opeace.login
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.home.HomeActivity
 import com.aunt.opeace.login.email.EmailInputActivity
+import com.aunt.opeace.signup.SignupActivity
 import com.aunt.opeace.ui.theme.WHITE_300
 import com.aunt.opeace.ui.theme.WHITE_600
 import kotlinx.coroutines.flow.collectLatest
@@ -48,10 +51,11 @@ private fun Content(viewModel: LoginViewModel) {
         viewModel.effect.collectLatest {
             when (it) {
                 Effect.GoogleLogin,
-                Effect.KakaoLogin -> Unit
-
+                Effect.KakaoLogin -> viewModel.kakaoLogin(activity)
                 Effect.MoveToMain -> moveToHome(activity = activity)
+                Effect.MoveToSignUp -> moveToSignUp(activity = activity)
                 Effect.MoveToEmailInput -> moveToEmailInput(activity = activity)
+                is Effect.Error -> showMessage(activity, it.message)
             }
         }
     }
@@ -62,7 +66,7 @@ private fun Content(viewModel: LoginViewModel) {
 @Composable
 private fun Content(
     nickname: String,
-    onSentEvent: (Event) -> Unit
+    onSentEvent: (Event) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -100,7 +104,7 @@ private fun Bottom(
     onClickGoogleLogin: () -> Unit,
     onClickKakaoLogin: () -> Unit,
     onClickLoginText: () -> Unit,
-    onClickEmailSignup: () -> Unit
+    onClickEmailSignup: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -110,6 +114,16 @@ private fun Bottom(
 //            onClickGoogleLogin = onClickGoogleLogin,
 //            onClickKakaoLogin = onClickKakaoLogin
 //        )
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+//                .padding(horizontal = 20.dp)
+                .clickable {
+                    onClickKakaoLogin()
+                },
+            painter = painterResource(id = R.drawable.kakao_login_large_narrow),
+            contentDescription = "kakao_login"
+        )
         // 서버 구현 안되서 그냥 파이버페이스 사용
         Text(
             modifier = Modifier
@@ -145,7 +159,7 @@ private fun Bottom(
 @Composable
 private fun LoginLogo(
     onClickGoogleLogin: () -> Unit,
-    onClickKakaoLogin: () -> Unit
+    onClickKakaoLogin: () -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(space = 16.dp)) {
         LoginLogo(
@@ -162,7 +176,7 @@ private fun LoginLogo(
 @Composable
 private fun LoginLogo(
     @DrawableRes drawableRes: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Image(
         modifier = Modifier.clickable(onClick = onClick),
@@ -177,4 +191,12 @@ private fun moveToEmailInput(activity: LoginActivity) {
 
 private fun moveToHome(activity: LoginActivity) {
     activity.startActivity(Intent(activity, HomeActivity::class.java))
+}
+
+private fun moveToSignUp(activity: LoginActivity) {
+    activity.startActivity(Intent(activity, SignupActivity::class.java))
+}
+
+private fun showMessage(activity: LoginActivity, message: String) {
+    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
 }

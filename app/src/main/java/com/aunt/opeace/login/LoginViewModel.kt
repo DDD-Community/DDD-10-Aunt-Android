@@ -4,8 +4,7 @@ import android.content.Context
 import com.aunt.opeace.BaseEffect
 import com.aunt.opeace.BaseViewModel
 import com.aunt.opeace.preference.OPeacePreference
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
@@ -20,8 +19,6 @@ class LoginViewModel @Inject constructor(
     private val preference: OPeacePreference,
     oPeacePreference: OPeacePreference
 ) : BaseViewModel() {
-    private val opeaceAuth = Firebase.auth
-
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
@@ -43,12 +40,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun kakaoLogin(context: Context) {
-        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+        val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) {
                 preference.setLogin(false)
-                if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                    return@loginWithKakaoTalk
-                }
                 setEffect { Effect.Error(error.message ?: "") }
             }
             if (token != null) {
@@ -59,6 +53,28 @@ class LoginViewModel @Inject constructor(
                     setEffect { Effect.MoveToSignUp }
                 }
             }
+        }
+
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+                if (error != null) {
+                    if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        preference.setLogin(false)
+                        setEffect { Effect.Error(error.message ?: "") }
+                        return@loginWithKakaoTalk
+                    }
+                    UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+                } else if (token != null) {
+                    preference.setLogin(true)
+                    if (preference.isSignup()) {
+                        setEffect { Effect.MoveToMain }
+                    } else {
+                        setEffect { Effect.MoveToSignUp }
+                    }
+                }
+            }
+        } else {
+            UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
         }
     }
 }

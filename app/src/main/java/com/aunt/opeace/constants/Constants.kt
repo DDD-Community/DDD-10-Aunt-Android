@@ -1,5 +1,8 @@
 package com.aunt.opeace.constants
 
+val SERVICE_URL = "https://material-wok-80b.notion.site/OPEACE-033fd56255c44d3780bf15d35806d57e?pvs=4"
+val PERSONAL_URL = "https://material-wok-80b.notion.site/OPEACE-1dd9453836af450fa7750e1fca2a2531"
+
 val jobList = listOf(
     "경영",
     "광고",

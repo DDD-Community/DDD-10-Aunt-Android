@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_200
+import com.aunt.opeace.ui.theme.WHITE_400
+import com.aunt.opeace.ui.theme.WHITE_600
 
 @Composable
 fun OPeaceButton(
@@ -22,8 +24,8 @@ fun OPeaceButton(
     title: String = "다음",
     enabled: Boolean = true,
     containerColor: Color = LIGHTEN,
-    disabledContainerColor: Color = Color.Gray,
-    enabledTextColor: Color = WHITE,
+    disabledContainerColor: Color = WHITE_400,
+    enabledTextColor: Color = WHITE_600,
     disabledTextColor: Color = WHITE_200,
     onClick: () -> Unit
 ) {

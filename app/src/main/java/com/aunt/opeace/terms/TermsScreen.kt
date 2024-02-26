@@ -1,6 +1,7 @@
 package com.aunt.opeace.terms
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.common.OPeaceButton
+import com.aunt.opeace.constants.PERSONAL_URL
+import com.aunt.opeace.constants.SERVICE_URL
 import com.aunt.opeace.login.LoginActivity
 import com.aunt.opeace.ui.theme.BLACK
 import com.aunt.opeace.ui.theme.Color_1D1D1D
@@ -110,13 +113,19 @@ private fun Content(viewModel: TermsViewModel) {
                 isChipService = isChipService.not()
             },
             onClickServiceText = {
-
+                moveToView(
+                    activity = activity,
+                    urlType = UrlType.SERVICE
+                )
             },
             onClickChipInfo = {
                 isChipInfo = isChipInfo.not()
             },
             onClickInfoText = {
-
+                moveToView(
+                    activity = activity,
+                    urlType = UrlType.PERSONAL
+                )
             }
         )
         OPeaceButton(
@@ -124,7 +133,6 @@ private fun Content(viewModel: TermsViewModel) {
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 29.dp),
             enabled = isChipTerms,
-            containerColor = Color_1D1D1D,
             onClick = {
                 viewModel.handleEvent(event = Event.OnClickNext)
             }
@@ -289,4 +297,17 @@ private fun Chip(
 
 private fun moveToLogin(activity: TermsActivity) {
     activity.startActivity(Intent(activity, LoginActivity::class.java))
+}
+
+private fun moveToView(activity: TermsActivity, urlType: UrlType) {
+    activity.startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(if (urlType == UrlType.SERVICE) {
+                SERVICE_URL
+            } else {
+                PERSONAL_URL
+            })
+        )
+    )
 }

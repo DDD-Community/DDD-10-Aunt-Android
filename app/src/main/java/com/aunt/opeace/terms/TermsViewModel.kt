@@ -31,3 +31,8 @@ sealed interface Event {
 sealed interface Effect : BaseEffect {
     data object MoveToLogin : Effect
 }
+
+enum class UrlType {
+    SERVICE,
+    PERSONAL
+}

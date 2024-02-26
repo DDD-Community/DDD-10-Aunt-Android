@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -117,6 +118,7 @@ private fun Bottom(
         Image(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(54.dp)
 //                .padding(horizontal = 20.dp)
                 .clickable {
                     onClickKakaoLogin()
@@ -125,20 +127,6 @@ private fun Bottom(
             contentDescription = "kakao_login"
         )
         // 서버 구현 안되서 그냥 파이버페이스 사용
-        Text(
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-                .clickable(onClick = onClickEmailSignup),
-            text = if (nickname.isBlank()) {
-                "이메일로 가입하기"
-            } else {
-                "로그인"
-            },
-            color = WHITE_300,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W500,
-            textDecoration = TextDecoration.Underline
-        )
         Text(
             modifier = Modifier
                 .padding(
@@ -190,7 +178,11 @@ private fun moveToEmailInput(activity: LoginActivity) {
 }
 
 private fun moveToHome(activity: LoginActivity) {
-    activity.startActivity(Intent(activity, HomeActivity::class.java))
+    activity.startActivity(
+        Intent(activity, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+    )
 }
 
 private fun moveToSignUp(activity: LoginActivity) {

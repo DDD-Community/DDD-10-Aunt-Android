@@ -32,11 +32,6 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow(State(isLogin = oPeacePreference.isLogin()))
     val state: StateFlow<State> get() = _state
 
-    init {
-        getBlockCards()
-        //setDatabase()
-    }
-
     fun handleEvent(event: Event) = when (event) {
         is Event.OnClickLike -> updateCard(card = event.card)
         is Event.OnClickFilter -> setFilter(filter = event.filter)
@@ -55,7 +50,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getBlockCards() {
+    fun getBlockCards() {
         setIsLoading(true)
         viewModelScope.launch {
             runCatching {
@@ -86,7 +81,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 database.collection(COLLECTION_CARD)
-                    .orderBy(FIELD_CREATED_TIME, Query.Direction.ASCENDING)
+                    .orderBy(FIELD_CREATED_TIME, Query.Direction.DESCENDING)
                     .get()
                     .addOnSuccessListener {
                         val list = mutableListOf<CardItem>()

@@ -31,17 +31,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +52,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aunt.opeace.R
 import com.aunt.opeace.common.FlipController
@@ -67,6 +72,7 @@ import com.aunt.opeace.ui.theme.Color_77777
 import com.aunt.opeace.ui.theme.LIGHTEN
 import com.aunt.opeace.ui.theme.WHITE
 import com.aunt.opeace.ui.theme.WHITE_200
+import com.aunt.opeace.ui.theme.WHITE_300
 import com.aunt.opeace.ui.theme.WHITE_400
 import com.aunt.opeace.ui.theme.WHITE_500
 import com.aunt.opeace.ui.theme.WHITE_600
@@ -79,6 +85,20 @@ fun HomeScreen() {
     val viewModel: HomeViewModel = viewModel()
     val activity = LocalContext.current as HomeActivity
     val sheetState = rememberModalBottomSheetState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                viewModel.getBlockCards()
+            }
+        }
+    }
 
     LaunchedEffect(key1 = viewModel.effect) {
         viewModel.effect.collect {
@@ -233,71 +253,83 @@ private fun Content(
                         })
                 }
 
-                items(cards.size) {
-                    val flipController = remember(key1 = it) { FlipController() }
-                    Flippable(
-                        frontSide = {
-                            // TODO 구현 필요
-                            // onClickFirstButton, onClickSecondButton 클릭 시
-                            // 응답 값 + 1, 결과값 만들어야하는데 여기 계산해야함....
-                            OPeaceCard(
-                                nickname = cards[it].nickname,
-                                job = cards[it].job,
-                                age = cards[it].age,
-                                image = "",
-                                title = cards[it].title,
-                                firstWord = cards[it].firstWord,
-                                firstNumber = cards[it].firstNumber,
-                                secondWord = cards[it].secondWord,
-                                secondNumber = cards[it].secondNumber,
-                                isMore = isLogin,
-                                onClickFirstButton = {
-                                    flipController.flip()
-                                    Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
-                                },
-                                onClickSecondButton = {
-                                    flipController.flip()
-                                    Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
-                                },
-                                onClickMore = {
-                                    bottomSheetType = BottomSheetType.BLOCK
-                                    showBottomSheet = true
-                                    onSentEvent(Event.OnClickMore(it))
-                                }
-                            )
-                        },
-                        backSide = {
-                            OPeaceSelectedCard(
-                                nickname = cards[it].nickname,
-                                job = cards[it].job,
-                                age = cards[it].age,
-                                image = "",
-                                title = cards[it].title,
-                                firstWord = cards[it].firstWord,
-                                firstNumber = cards[it].firstNumber,
-                                firstPercent = cards[it].firstPercent,
-                                firstResultList = cards[it].firstResult,
-                                secondWord = cards[it].secondWord,
-                                secondNumber = cards[it].secondNumber,
-                                secondPercent = cards[it].secondPercent,
-                                secondResultList = cards[it].secondResult,
-                                respondCount = cards[it].respondCount,
-                                likeCount = cards[it].likeCount,
-                                onClickLike = {
-                                    if (isLogin) {
-                                        onSentEvent(Event.OnClickLike(cards[it]))
+                if (cards.isEmpty() && isLoading.not()) {
+                    item {
+                        EmptyView(modifier = Modifier.padding(top = 80.dp))
+                    }
+                } else {
+                    items(cards.size) {
+                        val flipController = remember(key1 = it) { FlipController() }
+                        Flippable(
+                            frontSide = {
+                                // TODO 구현 필요
+                                // onClickFirstButton, onClickSecondButton 클릭 시
+                                // 응답 값 + 1, 결과값 만들어야하는데 여기 계산해야함....
+                                OPeaceCard(
+                                    nickname = cards[it].nickname,
+                                    job = cards[it].job,
+                                    age = cards[it].age,
+                                    image = "",
+                                    title = cards[it].title,
+                                    firstWord = cards[it].firstWord,
+                                    firstNumber = cards[it].firstNumber,
+                                    secondWord = cards[it].secondWord,
+                                    secondNumber = cards[it].secondNumber,
+                                    isMore = isLogin,
+                                    onClickFirstButton = {
+                                        if (isLogin) {
+                                            flipController.flip()
+                                        } else {
+                                            Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    onClickSecondButton = {
+                                        if (isLogin) {
+                                            flipController.flip()
+                                        } else {
+                                            Toast.makeText(context, "로그인 해주세요", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    onClickMore = {
+                                        bottomSheetType = BottomSheetType.BLOCK
+                                        showBottomSheet = true
+                                        onSentEvent(Event.OnClickMore(it))
                                     }
-                                },
-                                isMore = isLogin,
-                                onClickMore = {
-                                    bottomSheetType = BottomSheetType.BLOCK
-                                    showBottomSheet = true
-                                    onSentEvent(Event.OnClickMore(it))
-                                }
-                            )
-                        },
-                        flipController = flipController
-                    )
+                                )
+                            },
+                            backSide = {
+                                OPeaceSelectedCard(
+                                    nickname = cards[it].nickname,
+                                    job = cards[it].job,
+                                    age = cards[it].age,
+                                    image = "",
+                                    title = cards[it].title,
+                                    firstWord = cards[it].firstWord,
+                                    firstNumber = cards[it].firstNumber,
+                                    firstPercent = cards[it].firstPercent,
+                                    firstResultList = cards[it].firstResult,
+                                    secondWord = cards[it].secondWord,
+                                    secondNumber = cards[it].secondNumber,
+                                    secondPercent = cards[it].secondPercent,
+                                    secondResultList = cards[it].secondResult,
+                                    respondCount = cards[it].respondCount,
+                                    likeCount = cards[it].likeCount,
+                                    onClickLike = {
+                                        if (isLogin) {
+                                            onSentEvent(Event.OnClickLike(cards[it]))
+                                        }
+                                    },
+                                    isMore = isLogin,
+                                    onClickMore = {
+                                        bottomSheetType = BottomSheetType.BLOCK
+                                        showBottomSheet = true
+                                        onSentEvent(Event.OnClickMore(it))
+                                    }
+                                )
+                            },
+                            flipController = flipController
+                        )
+                    }
                 }
             }
             Text(
@@ -522,6 +554,32 @@ private fun BottomSheetContentText(
         fontSize = 20.sp,
         text = text
     )
+}
+
+@Composable
+private fun EmptyView(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_login_logo),
+            contentDescription = null
+        )
+        Text(
+            text = "조건에 맞는 고민이 없어요",
+            color = WHITE_200,
+            fontWeight = FontWeight.W700,
+            fontSize = 24.sp
+        )
+        Text(
+            text = "직접 고민을 등록해보세요",
+            color = WHITE_300,
+            fontWeight = FontWeight.W500,
+            fontSize = 16.sp
+        )
+    }
 }
 
 @Preview(showBackground = true)

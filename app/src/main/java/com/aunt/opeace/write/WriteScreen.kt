@@ -411,7 +411,7 @@ private fun EmojiPicker(onClickEmoji: (String) -> Unit) {
 private fun moveToHome(activity: WriteActivity) {
     activity.startActivity(
         Intent(activity, HomeActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
     )
 }

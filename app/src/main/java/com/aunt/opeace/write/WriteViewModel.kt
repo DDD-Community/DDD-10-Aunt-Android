@@ -56,7 +56,8 @@ class WriteViewModel @Inject constructor(
                             job = oPeacePreference.getUserInfo().job,
                             title = title,
                             firstWord = firstAnswer,
-                            secondWord = secondAnswer
+                            secondWord = secondAnswer,
+                            createdTime = System.currentTimeMillis()
                         )
                     )
             }.onSuccess {
